@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://pcj5vqd7p4l4"]
+
+[ext_resource type="Script" path="res://Controls/MapTile.gd" id="1_p5sam"]
+
+[node name="MapTile" type="Node2D"]
+script = ExtResource("1_p5sam")
