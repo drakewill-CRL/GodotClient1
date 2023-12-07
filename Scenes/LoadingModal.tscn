@@ -1,0 +1,3 @@
+[gd_scene format=3 uid="uid://1bql6vxd38y3"]
+
+[node name="LoadingModal" type="Node2D"]

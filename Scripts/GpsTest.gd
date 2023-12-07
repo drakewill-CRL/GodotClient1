@@ -46,15 +46,17 @@ func _ready():
 	else:
 		print("singleton list")
 		var singletons = ProjectSettings.get_setting("_global_script_classes")
-		for s in singletons:
-			print(s)
+		if (singletons != null):
+			for s in singletons:
+				print(s)
 		
+		lb_location_info.text = "No GPS support"
 
 
 var hasSetup = false
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if (!hasSetup):
+	if (!hasSetup && gps_provider != null):
 		gps_provider.on_monitoring_location_result.connect(on_monitoring_location_result)
 		print("Monitor location connected")
 		gps_provider.start_monitoring(gps_provider.get_accuracy_high(), 5000, 10.0, true)

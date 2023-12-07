@@ -58,6 +58,7 @@ offset_top = 1000.0
 offset_right = 1041.0
 offset_bottom = 1080.0
 theme_override_font_sizes/font_size = 52
+text = "http://192.168.50.74:5000"
 
 [node name="btnLogin" type="Button" parent="."]
 offset_left = 458.985
@@ -68,4 +69,16 @@ theme_override_font_sizes/font_size = 52
 text = "Login
 "
 
+[node name="btnCreateAcct" type="Button" parent="."]
+offset_left = 322.0
+offset_top = 1449.0
+offset_right = 713.0
+offset_bottom = 1529.0
+theme_override_font_sizes/font_size = 52
+text = "Create Account
+"
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
 [connection signal="pressed" from="btnLogin" to="." method="_on_btn_login_pressed"]
+[connection signal="pressed" from="btnCreateAcct" to="." method="_on_btn_create_acct_pressed"]
