@@ -20,38 +20,78 @@ static func EncodeLatLon(lat, lon):
 	
 static func EncodeLatLonSize(lat, lon, size):
 	var code = ''
-	var currentLat = int(floor((lat + 90) * 8000))
-	var currentLon = int(floor((lon + 180) * 8000))
-	
-	#if (size == 11):
-		#currentLat *= 5
-		#currentLon *= 4
-		#more
-	#else:
-		#pass
-		
+	var digit11 = ''
 	var nextLatChar = 0
 	var nextLonChar = 0
+	
+	var xMul = 8000
+	var yMul = 8000
+	if size == 11:
+		xMul *= 4
+		yMul *= 5
+		
+	var currentLat = int(floor((lat + 90) * yMul))
+	var currentLon = int(floor((lon + 180) * xMul))
+		
+	if size == 11:
+		var nextLonIndex = (currentLon % 4) 
+		var nextLatIndex = (currentLat % 5)
+		var indexDigit = (nextLatIndex * 4 + nextLonIndex)
+		digit11 = CODE_ALPHABET_[indexDigit]
+		currentLat = floor(currentLat / 5)
+		currentLon = floor(currentLon / 4)
+	
 	for i in 5:
-		print(str(lat) + ", " + str(lon))
 		nextLonChar = (currentLon % 20)
 		nextLatChar = (currentLat % 20)
 		
-		code = CODE_ALPHABET_.substr(nextLatChar, 1) + CODE_ALPHABET_.substr(nextLonChar, 1) + code
+		code = CODE_ALPHABET_[nextLatChar] + CODE_ALPHABET_[nextLonChar] + code
 		currentLat = floor(currentLat / 20)
 		currentLon = floor(currentLon / 20)
-		print(code)
-		
-	#if (size == 11):
-		#something
+
+	code = code + digit11
 	
-	return code
+	return code.substr(0, 8) + "+" + code.substr(8, -1)
 	
 static func RemovePlus(code):
 	return code.replace("+", "")
 	
 static func ShiftCode(code, xChange, yChange):
-	#change the given PlusCode to the one with the final X and Y characters moved
-	# the given position count (EX: 842255PP, 2, -1 returns 842255MR
-	pass
+	#This function is not intended to move a code more than 20 cells in a direction to force carry
+	#more than 1 carry/borrow digit right now.
+	#that should be done by supplying the substring to move at that level.
+	code = RemovePlus(code)
+	var xVals = []
+	var yVals = []
 	
+	for i in code.length() / 2:
+		var yLet = code.substr(i * 2, 1)
+		var xLet = code.substr((i * 2) + 1, 1)
+		yVals.push_back(CODE_ALPHABET_.find(yLet))
+		xVals.push_back(CODE_ALPHABET_.find(xLet))
+		
+	if xChange != 0:
+		xVals[xVals.size() -1] += xChange
+		for i in range(xVals.size() -1, 0, -1):
+			if (xVals[i] > 19):
+				xVals[i -1] = xVals[i - 1] + (1)
+				xVals[i] = xVals[i] - 20
+			if (xVals[i] < 0):
+				xVals[i -1] = xVals[i - 1] - (1)
+				xVals[i] = xVals[i] + 20
+		
+	if yChange != 0:
+		yVals[yVals.size() -1] += yChange
+		for i in range(yVals.size() -1, 0, -1):
+			if (yVals[i] > 19):
+				yVals[i -1] = yVals[i - 1] + (1)
+				yVals[i] = yVals[i] - 20
+			if (yVals[i] < 0):
+				yVals[i -1] = yVals[i - 1] - (1)
+				yVals[i] = yVals[i] + 20
+
+	var newCode = ''
+	for i in code.length() / 2:
+		newCode = newCode + CODE_ALPHABET_[yVals[i]] + CODE_ALPHABET_[xVals[i]]
+	
+	return newCode

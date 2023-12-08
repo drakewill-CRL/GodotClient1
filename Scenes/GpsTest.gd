@@ -1,5 +1,6 @@
 extends Node2D
 
+#TODO: should no longer need these values here, just listen for PraxisMapper.plusCode_changed
 var gps_provider
 var last_latitude
 var last_longitude
@@ -51,7 +52,7 @@ func _ready():
 				print(s)
 		
 		lb_location_info.text = "No GPS support"
-
+		
 
 var hasSetup = false
 # Called every frame. 'delta' is the elapsed time since the previous frame.
