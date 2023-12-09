@@ -4,3 +4,9 @@
 
 [node name="OverheadView" type="Node2D"]
 script = ExtResource("1_x4bur")
+
+[node name="TileContainer" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0

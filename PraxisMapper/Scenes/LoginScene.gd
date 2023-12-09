@@ -31,8 +31,8 @@ func login_completed(result, response_code, headers, body):
 	PraxisMapper.loginToken = data.authToken
 	#Now, change to the post-login scene here.
 	#get_tree().change_scene_to_file("res://Scenes/GpsTest.tscn")
-	get_tree().change_scene_to_file("res://Scenes/test1.tscn")
-	#get_tree().change_scene_to_file("res://Scenes/OverheadView.tscn")
+	#get_tree().change_scene_to_file("res://Scenes/test1.tscn")
+	get_tree().change_scene_to_file("res://Scenes/OverheadView.tscn")
 
 func _on_btn_login_pressed():
 	#here is where login logic goes.

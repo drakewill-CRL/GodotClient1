@@ -9,7 +9,8 @@ static var loginToken
 #config values referenced by components
 static var mapTileWidth = 320
 static var mapTileHeight = 400
-static var debugStartingPlusCode = "85633QG4VV" #Elysian Park, Los Angeles, CA
+#static var debugStartingPlusCode = "85633QG4VV" #Elysian Park, Los Angeles, CA
+static var debugStartingPlusCode = "86FRXXXPM8" #Ohio State University, Columbus, OH
 
 #storage values for global access at any time.
 static var currentPlusCode = '' #The Cell10 we are currently in.
@@ -36,6 +37,6 @@ func _ready():
 	else:
 		print("GPS Provider not loaded (probably debugging on PC)")
 		currentPlusCode = debugStartingPlusCode
-		lastPlusCode = debugStartingPlusCode
+		#lastPlusCode = debugStartingPlusCode
 		#TODO: add the DebugMovement node to the scene tree.
 	
