@@ -8,5 +8,5 @@ script = ExtResource("1_57dev")
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
 
 [node name="TextureRect" type="TextureRect" parent="."]
-offset_right = 80.0
-offset_bottom = 100.0
+offset_right = 320.0
+offset_bottom = 400.0

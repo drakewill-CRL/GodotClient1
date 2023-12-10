@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="PM GD Client Test"
-run/main_scene="res://PraxisMapper/Scenes/LoginScene.tscn"
+run/main_scene="res://Scenes/OverheadView.tscn"
 config/features=PackedStringArray("4.1", "Mobile")
 config/icon="res://icon.svg"
 
@@ -29,6 +29,10 @@ window/handheld/orientation=1
 [dotnet]
 
 project/assembly_name="PM GD Client Test"
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
 
 [rendering]
 

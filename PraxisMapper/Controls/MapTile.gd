@@ -12,6 +12,35 @@ var currentTile = ''
 var xOffset = 0
 var yOffset = 0
 
+#fires off a signal indicating the user tapped this tile, and what the target PlusCode they tapped is
+signal user_tapped(plusCode) 
+
+func getTappedCode(x, y):
+	var cellsX = PraxisMapper.mapTileWidth / 20
+	var cellsY = PraxisMapper.mapTileHeight / 20
+		
+	var tappedCell = PlusCodes.ShiftCode(currentTile + "22", x / cellsX, (400 - y) / cellsY )
+	print(tappedCell)
+	return tappedCell
+
+#The function to detect user taps.
+#TODO: this makes all mapTiles fire off the check on tap. Need to limit that to the tapped one
+#maybe thats handled by the parent scene?
+func _input_event(event):
+	if event is InputEventScreenTouch and event.is_pressed() == true:
+		
+		#now work out which plusCode was tapped
+		var innerX =  int(event.position.x) % PraxisMapper.mapTileWidth # - position.x
+		var innerY =  int(event.position.y) % PraxisMapper.mapTileHeight #- position.y
+		
+		#innerX/Y should now be the pixel inside this control we tapped.
+		#and this map tile is a Cell8, so we can work it out to a Cell11 accuracy
+		var cellsX = PraxisMapper.mapTileWidth / 80
+		var cellsY = PraxisMapper.mapTileHeight / 100
+		
+		var tappedCell = PlusCodes.ShiftCode(currentTile + "22", innerX / cellsX, innerY / cellsY )
+		print(tappedCell)
+
 func tile_called(result, responseCode, headers, body):
 	print(responseCode)
 	request.request_completed.disconnect(tile_called)
