@@ -28,7 +28,8 @@ func login_completed(result, response_code, headers, body):
 	#if successful, save name/pwd/server to file to load as auto-login next time.
 	PraxisMapper.username = txtUsername.text
 	PraxisMapper.password = txtPassword.text
-	PraxisMapper.loginToken = data.authToken
+	PraxisMapper.serverURL = txtServer.text
+	PraxisMapper.authKey = data.authToken
 	#Now, change to the post-login scene here.
 	#get_tree().change_scene_to_file("res://Scenes/GpsTest.tscn")
 	#get_tree().change_scene_to_file("res://Scenes/test1.tscn")

@@ -6,6 +6,11 @@ extends Node2D
 func _ready():
 	print("getting new tile")
 	mapTile.GetTile("86HWGGGP")
+	
+	var apicallScene = preload("res://PraxisMapper/Controls/PraxisAPICall.tscn")
+	var apicall = apicallScene.instantiate()
+	var results = apicall.call_url("/Server/Test")
+	print(results.get_string_from_utf8())
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

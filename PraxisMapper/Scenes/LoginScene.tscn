@@ -58,7 +58,7 @@ offset_top = 1000.0
 offset_right = 1041.0
 offset_bottom = 1080.0
 theme_override_font_sizes/font_size = 52
-text = "http://192.168.50.74:5000"
+text = "http://192.168.50.74:5000/"
 
 [node name="btnLogin" type="Button" parent="."]
 offset_left = 458.985

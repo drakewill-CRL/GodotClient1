@@ -1,10 +1,12 @@
 extends Node
 class_name PraxisMapper
 
-# Values used for login and auth
+# Values used for login/auth and server comms
 static var username
 static var password
-static var loginToken
+static var authKey = '' #for normal security with a login
+static var headerKey = '' #for header-only security
+static var serverURL = '' 
 
 #config values referenced by components
 static var mapTileWidth = 320

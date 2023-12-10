@@ -47,6 +47,8 @@ func _ready():
 	if (int(tilesY) % 2 == 0):
 		tilesY += 1
 	
+	
+	
 	var startX = ((tilesX * PraxisMapper.mapTileWidth) / -2) - (size.x / 2)
 	var startY = ((tilesY * PraxisMapper.mapTileHeight) / -2) + (size.y / 2)
 	
