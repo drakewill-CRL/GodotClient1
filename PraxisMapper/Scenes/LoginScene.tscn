@@ -80,5 +80,12 @@ text = "Create Account
 
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
 
+[node name="lblError" type="Label" parent="."]
+offset_left = 42.0
+offset_top = 1124.0
+offset_right = 297.0
+offset_bottom = 1196.0
+theme_override_font_sizes/font_size = 50
+
 [connection signal="pressed" from="btnLogin" to="." method="_on_btn_login_pressed"]
 [connection signal="pressed" from="btnCreateAcct" to="." method="_on_btn_create_acct_pressed"]
