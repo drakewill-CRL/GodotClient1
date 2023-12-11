@@ -2,11 +2,12 @@ extends Node
 class_name PraxisMapper
 
 # Values used for login/auth and server comms
-static var username
-static var password
+static var username = ''
+static var password = ''
 static var authKey = '' #for normal security with a login
 static var headerKey = '' #for header-only security
-static var serverURL = '' 
+static var serverURL = '' #dedicated games want this to be a fixed value and not entered on the login screen.
+#NOTE: serverURL should NOT end with a /. Changed from Solar2D's pattern.
 
 #config values referenced by components
 static var mapTileWidth = 320
@@ -20,8 +21,29 @@ static var lastPlusCode = '' #the previous Cell10 we visited.
 
 signal plusCode_changed(current, previous)
 
-#TODO: set this in auto-load to always run.
+#support components
 static var gps_provider
+static var reauthCode = 419 #AuthTimeout HTTP response
+static var isReauthing = false #most calls should abort or wait if we're reauthing.
+
+static func reauthListener(result, response_code, headers, body):
+	if response_code == 200:
+		var json = JSON.new()
+		json.parse(body.get_string_from_utf8())
+		var data = json.get_data()
+		PraxisMapper.authKey = data.authToken
+		isReauthing = false
+	else:
+		OS.delay_msec(1000)
+		PraxisMapper.reauth()
+
+static func reauth():
+	if (isReauthing == true):
+		return #TODO better handling/retry logic.
+		
+	isReauthing = true
+	var request = HTTPRequest.new()
+	var call = request.request(PraxisMapper.serverURL + "/Server/Login/" + PraxisMapper.username + "/" + PraxisMapper.password)
 
 #TODO: use signals here so other scenes can hook into this.
 func on_monitoring_location_result(location: Dictionary) -> void:
@@ -41,4 +63,4 @@ func _ready():
 		currentPlusCode = debugStartingPlusCode
 		#lastPlusCode = debugStartingPlusCode
 		#TODO: add the DebugMovement node to the scene tree.
-	
+
