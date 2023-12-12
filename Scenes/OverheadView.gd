@@ -10,6 +10,10 @@ extends Node2D
 #That probably requires another listener to shift the position of the node around a few pixels on 
 #plusCode change.
 
+@onready var camera : Camera2D = $Camera2D
+var startX = 0
+var startY = 0
+
 func _unhandled_input(event):
 	return #ignoring this for now.
 	if event is InputEventScreenTouch and event.is_pressed() == true:
@@ -39,18 +43,17 @@ func _ready():
 	#godot default anchor is top-left. Does that require adjusting this logic to center?
 	#PlusCode anchors are bottom-left, so there's a little work in mapping them together nicely.
 	
-	var tilesX = ceil(size.x / PraxisMapper.mapTileWidth)
-	var tilesY = ceil(size.y / PraxisMapper.mapTileHeight)
+	#5x7 tiles for a 1080p screen.
+	var tilesX = ceil(size.x / PraxisMapper.mapTileWidth) + 1
+	var tilesY = ceil(size.y / PraxisMapper.mapTileHeight) + 1
 	
 	if (int(tilesX) % 2 == 0):
 		tilesX += 1
 	if (int(tilesY) % 2 == 0):
 		tilesY += 1
 	
-	
-	
-	var startX = ((tilesX * PraxisMapper.mapTileWidth) / -2) - (size.x / 2)
-	var startY = ((tilesY * PraxisMapper.mapTileHeight) / -2) + (size.y / 2)
+	startX = -size.x /2 + (PraxisMapper.mapTileWidth / 2) #(((tilesX - 1) * PraxisMapper.mapTileWidth) / -2)
+	startY = -size.y /2 + (PraxisMapper.mapTileHeight / 2) #(((tilesY- 1) * PraxisMapper.mapTileHeight) / -2)
 	
 	#count:
 	#I want the total grid to be big enough that there's 1/2 a tile extra on each side.
@@ -58,8 +61,8 @@ func _ready():
 	#:EX: if 3x3 tiles cover screen exactly, I need at least 5x5?
 	
 	#this way gets the tiles set up so the current tile is in the center
-	for x in range(tilesX / -2, tilesX /2):
-		for y in range(tilesY / 2, tilesY / -2, -1):
+	for x in range(tilesX / -2, (tilesX /2) + 1):
+		for y in range(tilesY / -2, (tilesY / 2) + 1):
 	#this way would make all the math easier instead.
 	#for x in range(0, tilesX):
 		#for y in range(tilesY, 0, -1):
@@ -72,14 +75,36 @@ func _ready():
 			#tile.position.x = 320 * x
 			#tile.position.y = (400 * tilesY) - (400 * y)
 			#and centers-current-position.
-			tile.position.x = (x + (tilesX /2)) * 320
-			tile.position.y = size.y - (y + (tilesY /2)) * 400
+			#tile.position.x = (x + (tilesX /2)) * 320
+			#tile.position.y = size.y - (y + (tilesY /2)) * 400
+			
+			#this puts the center tile's top left corner at the top-left corner of the screen.
+			tile.position.x = x * PraxisMapper.mapTileWidth + x + x
+			tile.position.y = -y * PraxisMapper.mapTileHeight - y -y
 			PraxisCore.plusCode_changed.connect(tile.OnPlusCodeChanged)
 			tile.GetTile(PraxisMapper.currentPlusCode)
-
-#OK, its probably better to just lay out my items and let the camera handle scrolling.
-func _process(delta):
-	get_node("Camera2D").position.y += 1
+			
+	camera.position.x = startX
+	camera.position.y = startY
 	
-	#TODO: check if we've scrolled over, and if so reset position and ensure all tiles update
-	#that should happen automatically on plusCodeChanged, for reference, but I may manaully test it here.
+	PraxisCore.plusCode_changed.connect(CameraScroll)
+	
+func _process(delta):
+	#camera.position.x -= 1
+	pass
+	
+func CameraScroll(current, previous):
+	#if (current.substr(0,8) == previous.substr(0,8)):
+		#move camera to the correct position. 
+		#May not need to check for Cell8 changes, since map tiles listen for that.
+	var currentXPos = current.substr(10,1)
+	var xIndex = PlusCodes.CODE_ALPHABET_.find(currentXPos)
+	var xShift = (PraxisMapper.mapTileWidth / 2) -  (PraxisMapper.mapTileWidth / 20) * xIndex
+	#var prevXPos = previous.substr(10,1)
+	var currentYPos = current.substr(9,1)
+	var yIndex = PlusCodes.CODE_ALPHABET_.find(currentYPos)
+	var yShift = (PraxisMapper.mapTileHeight / 2) - (PraxisMapper.mapTileHeight / 20) * yIndex
+	#var prevYPos = previous.substr(9,1)
+	
+	camera.position.x = startX + xShift
+	camera.position.y = startY + yShift
