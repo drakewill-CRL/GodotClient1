@@ -10,3 +10,8 @@ script = ExtResource("1_57dev")
 [node name="TextureRect" type="TextureRect" parent="."]
 offset_right = 320.0
 offset_bottom = 400.0
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 60.0
+
+[connection signal="timeout" from="Timer" to="." method="GetTileGeneration"]

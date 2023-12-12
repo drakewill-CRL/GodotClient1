@@ -1,6 +1,9 @@
 extends Node
 class_name PraxisMapper
 
+#NOTE: PraxisMapper is the class name for static values.
+#For the singleton instance in autoload, use PraxisCore
+
 # Values used for login/auth and server comms
 static var username = ''
 static var password = ''
@@ -10,7 +13,7 @@ static var serverURL = '' #dedicated games want this to be a fixed value and not
 #NOTE: serverURL should NOT end with a /. Changed from Solar2D's pattern.
 
 #config values referenced by components
-static var mapTileWidth = 320
+static var mapTileWidth = 320 #TODO: load these from the server eventually
 static var mapTileHeight = 400
 #static var debugStartingPlusCode = "85633QG4VV" #Elysian Park, Los Angeles, CA
 static var debugStartingPlusCode = "86FRXXXPM8" #Ohio State University, Columbus, OH
@@ -19,17 +22,19 @@ static var debugStartingPlusCode = "86FRXXXPM8" #Ohio State University, Columbus
 static var currentPlusCode = '' #The Cell10 we are currently in.
 static var lastPlusCode = '' #the previous Cell10 we visited.
 
+#signals for components that need to respond to it.
 signal plusCode_changed(current, previous)
+signal location_changed(dictionary)
 
 #support components
 static var gps_provider
 static var reauthCode = 419 #AuthTimeout HTTP response
 static var isReauthing = false #most calls should abort or wait if we're reauthing.
 
-func forceChange(newCode):
+static func forceChange(newCode):
 	lastPlusCode = currentPlusCode
 	currentPlusCode = newCode
-	plusCode_changed.emit(currentPlusCode, lastPlusCode)
+	PraxisCore.plusCode_changed.emit(currentPlusCode, lastPlusCode)
 
 static func reauthListener(result, response_code, headers, body):
 	if response_code == 200:
@@ -50,8 +55,8 @@ static func reauth():
 	var request = HTTPRequest.new()
 	var call = request.request(PraxisMapper.serverURL + "/Server/Login/" + PraxisMapper.username + "/" + PraxisMapper.password)
 
-#TODO: use signals here so other scenes can hook into this.
 func on_monitoring_location_result(location: Dictionary) -> void:
+	location_changed.emit(location)
 	var plusCode = PlusCodes.EncodeLatLon(location["latitude"], location["longitude"])
 	if (plusCode != currentPlusCode):
 		lastPlusCode = currentPlusCode

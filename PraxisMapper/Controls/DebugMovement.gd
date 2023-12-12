@@ -4,16 +4,16 @@ extends Node2D
 @onready var label : Label = $CanvasLayer/ColorRect/Label
 
 func GoNorth():
-	PraxisCore.forceChange(PlusCodes.ShiftCode(PraxisMapper.currentPlusCode, 0, 1))
+	PraxisMapper.forceChange(PlusCodes.ShiftCode(PraxisMapper.currentPlusCode, 0, 1))
 	
 func GoSouth():
-	PraxisCore.forceChange(PlusCodes.ShiftCode(PraxisMapper.currentPlusCode, 0, -1))
+	PraxisMapper.forceChange(PlusCodes.ShiftCode(PraxisMapper.currentPlusCode, 0, -1))
 	
 func GoEast():
-	PraxisCore.forceChange(PlusCodes.ShiftCode(PraxisMapper.currentPlusCode, 1, 0))
+	PraxisMapper.forceChange(PlusCodes.ShiftCode(PraxisMapper.currentPlusCode, 1, 0))
 	
 func GoWest():
-	PraxisCore.forceChange(PlusCodes.ShiftCode(PraxisMapper.currentPlusCode, -1, 0))
+	PraxisMapper.forceChange(PlusCodes.ShiftCode(PraxisMapper.currentPlusCode, -1, 0))
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
