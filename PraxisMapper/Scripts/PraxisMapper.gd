@@ -26,6 +26,11 @@ static var gps_provider
 static var reauthCode = 419 #AuthTimeout HTTP response
 static var isReauthing = false #most calls should abort or wait if we're reauthing.
 
+func forceChange(newCode):
+	lastPlusCode = currentPlusCode
+	currentPlusCode = newCode
+	plusCode_changed.emit(currentPlusCode, lastPlusCode)
+
 static func reauthListener(result, response_code, headers, body):
 	if response_code == 200:
 		var json = JSON.new()
@@ -61,6 +66,10 @@ func _ready():
 	else:
 		print("GPS Provider not loaded (probably debugging on PC)")
 		currentPlusCode = debugStartingPlusCode
-		#lastPlusCode = debugStartingPlusCode
-		#TODO: add the DebugMovement node to the scene tree.
+		var debugControlScene = preload("res://PraxisMapper/Controls/DebugMovement.tscn")
+		var debugControls = debugControlScene.instantiate()
+		add_child(debugControls)
+		debugControls.position.x = 0
+		debugControls.position.y = 0
+		debugControls.z_index = 200
 

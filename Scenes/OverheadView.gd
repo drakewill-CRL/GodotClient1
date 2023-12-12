@@ -88,23 +88,27 @@ func _ready():
 	camera.position.y = startY
 	
 	PraxisCore.plusCode_changed.connect(CameraScroll)
+	CameraScroll(PraxisMapper.currentPlusCode, "")
 	
 func _process(delta):
 	#camera.position.x -= 1
 	pass
 	
-func CameraScroll(current, previous):
+func CameraScroll(currentPlusCode, previousPlusCode):
 	#if (current.substr(0,8) == previous.substr(0,8)):
 		#move camera to the correct position. 
 		#May not need to check for Cell8 changes, since map tiles listen for that.
-	var currentXPos = current.substr(10,1)
+	print("scrolling camera to " + currentPlusCode)
+	var currentXPos = currentPlusCode.substr(9,1)
 	var xIndex = PlusCodes.CODE_ALPHABET_.find(currentXPos)
 	var xShift = (PraxisMapper.mapTileWidth / 2) -  (PraxisMapper.mapTileWidth / 20) * xIndex
 	#var prevXPos = previous.substr(10,1)
-	var currentYPos = current.substr(9,1)
+	var currentYPos = currentPlusCode.substr(8,1)
 	var yIndex = PlusCodes.CODE_ALPHABET_.find(currentYPos)
 	var yShift = (PraxisMapper.mapTileHeight / 2) - (PraxisMapper.mapTileHeight / 20) * yIndex
 	#var prevYPos = previous.substr(9,1)
 	
-	camera.position.x = startX + xShift
+	print("current pos:" + currentXPos + "," + currentYPos)
+	
+	camera.position.x = startX - xShift
 	camera.position.y = startY + yShift

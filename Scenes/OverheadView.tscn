@@ -7,4 +7,3 @@ script = ExtResource("1_x4bur")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 0
-position_smoothing_enabled = true
