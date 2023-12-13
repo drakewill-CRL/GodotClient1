@@ -85,11 +85,10 @@ func LoadTile(plusCode):
 	else:
 		request.request_completed.connect(tile_called)
 	
+		print(PraxisMapper.serverURL + "/MapTile/Area/" + plusCode + "/" + styleSet)
 		var ok = request.request(PraxisMapper.serverURL + "/MapTile/Area/" + plusCode + "/" + styleSet)
 		if (ok != OK):
 			print("maptile request not ok")
-			pass
-		texRect.texture
 	
 func GetTile(plusCode):	
 	if PraxisMapper.currentPlusCode.substr(0,8) == PraxisMapper.lastPlusCode.substr(0,8):

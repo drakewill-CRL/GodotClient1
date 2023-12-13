@@ -14,6 +14,8 @@ func _ready():
 	var lastData = FileAccess.open_encrypted_with_pass("user://savedData.access", FileAccess.READ, "passkeyGoesHere")
 	if (lastData != null):
 		var data = lastData.get_as_text().split("|")
+		if (data[2].ends_with('/')):
+			data[2] = data[2].substr(0, data[2].length() - 2)
 		lastData.close()
 		txtUsername.text = data[0]
 		txtPassword.text = data[1]
@@ -64,7 +66,7 @@ func _on_btn_login_pressed():
 	lblError.text = "Logging in...."
 	request.request_completed.connect(login_completed)
 	
-	var call = request.request(txtServer.text + "Server/Login/" + txtUsername.text + "/" + txtPassword.text)
+	var call = request.request(txtServer.text + "/Server/Login/" + txtUsername.text + "/" + txtPassword.text)
 	if (call != OK):
 		pass #Todo see if this is necessary or can be handled in the complete call.
 
@@ -74,7 +76,7 @@ func _on_btn_create_acct_pressed():
 	lblError.text = "Creating account...."
 	request.request_completed.connect(createCompleted)
 	
-	var call = request.request(txtServer.text + "Server/CreateAccount/" + txtUsername.text + "/" + txtPassword.text, 
+	var call = request.request(txtServer.text + "/Server/CreateAccount/" + txtUsername.text + "/" + txtPassword.text, 
 	[], HTTPClient.METHOD_PUT)
 	if (call != OK):
 		pass #Todo see if this is necessary or can be handled in the complete call.
