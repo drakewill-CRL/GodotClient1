@@ -13,7 +13,7 @@ config_version=5
 config/name="PM GD Client Test"
 run/main_scene="res://PraxisMapper/Scenes/LoginScene.tscn"
 config/features=PackedStringArray("4.1", "Mobile")
-config/icon="res://icon.svg"
+config/icon="res://PraxisMapper/Resources/PraxisMapperIcon.png"
 
 [autoload]
 
