@@ -17,7 +17,6 @@ func _init():
 	else:
 		err = http.connect_to_host(PraxisMapper.serverURL) # Connect to host/port.
 
-	err =  http.connect_to_host("http://192.168.50.74", 5000) # Connect to host/port.
 	assert(err == OK) # Make sure connection is OK.
 	
 	# Wait until resolved and connected.
@@ -49,7 +48,6 @@ func call_url(endpoint, method = HTTPClient.METHOD_GET, body = ''):
 	while http.get_status() == HTTPClient.STATUS_REQUESTING:
 		# Keep polling for as long as the request is being processed.
 		http.poll()
-		print("Requesting...")
 		if OS.has_feature("web"):
 			# Synchronous HTTP requests are not supported on the web,
 			# so wait for the next main loop iteration.
@@ -59,7 +57,7 @@ func call_url(endpoint, method = HTTPClient.METHOD_GET, body = ''):
 
 	assert(http.get_status() == HTTPClient.STATUS_BODY or http.get_status() == HTTPClient.STATUS_CONNECTED) # Make sure request finished well.
 
-	print("response? ", http.has_response()) # Site might not have a response.
+	#print("response? ", http.has_response()) # Site might not have a response.
 
 	if http.has_response():
 		# If there is a response...
@@ -96,7 +94,245 @@ func call_url(endpoint, method = HTTPClient.METHOD_GET, body = ''):
 				rb = rb + chunk # Append to read buffer.
 		# Done!
 
-		print("bytes got: ", rb.size())
+		#print("bytes got: ", rb.size())
 		var text = rb.get_string_from_utf8()
-		print("Text: ", text)
+		#print("Text: ", text)
 		return rb #Let the caller decode this data the way they expect to have it.
+
+#Pre-made calls for stock endpoints
+#/Server controller APIs
+func GetServerBounds(): # Server's covered area in S|W|N|E order/format
+	var data = await call_url("/Server/Bounds")
+	return data.get_string_from_utf8()
+	
+func ServerTest(): # always returns 'OK'
+	var data = await call_url("/Server/Test")
+	return data.get_string_from_utf8()
+
+func MOTD(): #Message of the Day
+	var data = await call_url("/Server/MOTD")
+	return data.get_string_from_utf8()
+	
+func RandomPoint(): # A random point somewhere inside server bounds
+	var data = await call_url("/Server/RandomPoint")
+	return data.get_string_from_utf8()
+	
+func GDPRExport(): #All data available on the user as a string.
+	var data = await call_url("/Server/GdprExport")
+	return data.get_string_from_utf8()
+
+func DeleteAccount():
+	var data = await call_url("/Server/Account", HTTPClient.METHOD_DELETE)
+	return data.get_string_from_utf8()
+
+func Login(account, password):
+	var data = await call_url("/Server/Login/" + account + "/" + password)
+	return data.get_string_from_utf8()
+	
+func CreateAccount(account,password):
+	var data = await call_url("/Server/CreateAccount/" + account + "/" + password, HTTPClient.METHOD_PUT)
+	return data.get_string_from_utf8() #true or false
+
+func ChangePassword(account, oldPassword, newPassword):
+	var data = await call_url("/Server/ChangePassword/" + account + "/" + oldPassword + "/" + newPassword, HTTPClient.METHOD_PUT)
+	return data.get_string_from_utf8()
+
+#Data endpoint API calls. For games that don't have a dedicated plugin or early development testing.
+#Sets return true/false, Gets usually return JSON data.
+func SetAreaValue(plusCode, key, value, expiresIn = null):
+	var url = "/Data/Area/" + plusCode + "/" + key
+	if (expiresIn != null):
+		url += "/noval/" + str(expiresIn)
+	
+	var data = await call_url(url, HTTPClient.METHOD_PUT, value)
+	return data.get_string_from_utf8()
+	
+func GetAreaValue(plusCode, key):
+	var data = await call_url("/Data/Area/" + plusCode + "/" + key)
+	return data.get_string_from_utf8()
+	
+#TODO: Server doesn't currently allow for body values with expiration on Player.
+func SetPlayerValue(account, key, value, expiresIn = null):
+	var url = "/Data/Player/" + account + "/" + key
+	if (expiresIn != null):
+		url += "/" + value + "/" + str(expiresIn)
+	
+	var data = await call_url(url, HTTPClient.METHOD_PUT, value)
+	return data.get_string_from_utf8()
+	
+func GetPlayerValue(account, key):
+	var data = await call_url("/Data/Player/" + account + "/" + key)
+	return data.get_string_from_utf8()
+
+#TODO: Server doesn't currently allow for body values with expiration on Place
+func SetPlaceValue(place, key, value, expiresIn = null):
+	var url = "/Data/Place/" + place + "/" + key
+	if (expiresIn != null):
+		url += "/" + value + "/" + str(expiresIn)
+	
+	var data = await call_url(url, HTTPClient.METHOD_PUT, value)
+	return data.get_string_from_utf8()
+
+func GetPlaceValue(place, key):
+	var data = await call_url("/Data/Place/" + place + "/" + key)
+	return data.get_string_from_utf8()
+	
+func GetGlobalValue(key):
+	var data = await call_url("/Data/Global/" + key)
+	return data.get_string_from_utf8()
+
+func SetGlobalValue(key, value):
+	var data = await call_url("/Data/Global/" + key, HTTPClient.METHOD_PUT, value)
+	return data.get_string_from_utf8()
+	
+func DeleteGlobalValue(key):
+	var data = await call_url("/Data/Global/" + key, HTTPClient.METHOD_DELETE)
+	return data.get_string_from_utf8()
+	
+func GetAllPlayerData(player):
+	var data = await call_url("/Data/Player/All/" + player)
+	return data.get_string_from_utf8()
+
+func GetAllAreaData(player):
+	var data = await call_url("/Data/Area/All/" + player)
+	return data.get_string_from_utf8()
+
+func GetAllPlaceData(place):
+	var data = await call_url("/Data/Place/All/" + place)
+	return data.get_string_from_utf8()
+
+#SecureData endpoint API calls. 
+func SetSecureAreaValue(plusCode, key, value, password, expiresIn = null):
+	#TODO: server doesnt support value in body and expiration together.
+	var url = "/SecureData/Area/" + plusCode + "/" + key
+	if (expiresIn != null):
+		url += "/" + value + "/" + password + "/"+ str(expiresIn)
+	else:
+		url += "/" + password
+	
+	var data = await call_url(url, HTTPClient.METHOD_PUT, value)
+	return data.get_string_from_utf8()
+	
+func GetSecureAreaValue(plusCode, key, password):
+	var data = await call_url("/SecureData/Area/" + plusCode + "/" + key + "/" + password)
+	return data.get_string_from_utf8()
+	
+#TODO: Server doesn't currently allow for body values with expiration on Player.
+func SetSecurePlayerValue(account, key, value, password, expiresIn = null):
+	var url = "/SecureData/Player/" + account + "/" + key
+	if (expiresIn != null):
+		url += "/" + value + "/" + password + "/"+ str(expiresIn)
+	else:
+		url += "/" + password
+	
+	var data = await call_url(url, HTTPClient.METHOD_PUT, value)
+	return data.get_string_from_utf8()
+	
+func GetSecurePlayerValue(account, key, password):
+	var data = await call_url("/SecureData/Player/" + account + "/" + key + "/" + password)
+	return data.get_string_from_utf8()
+
+#TODO: Server doesn't currently allow for body values with expiration on Place
+func SetSecurePlaceValue(place, key, value, password, expiresIn = null):
+	var url = "/SecureData/Place/" + place + "/" + key
+	if (expiresIn != null):
+		url += "/" + value + "/" + password + "/"+ str(expiresIn)
+	else:
+		url += "/" + password
+	
+	var data = await call_url(url, HTTPClient.METHOD_PUT, value)
+	return data.get_string_from_utf8()
+
+func GetSecurePlaceValue(place, key, password):
+	var data = await call_url("/SecureData/Place/" + place + "/" + key)
+	return data.get_string_from_utf8()
+	
+#These don't return a value.
+func IncrementSecurePlaceValue(place, key, changeAmount, password, expiresIn = null):
+	var url = "/SecureData/Place/Increment/" + place + "/" + key + "/" + password  + "/" + changeAmount
+	if (expiresIn != null):
+		url += "/"+ str(expiresIn)
+	
+	var data = await call_url(url, HTTPClient.METHOD_PUT)
+	return data.get_string_from_utf8()
+	
+func IncrementSecurePlayerValue(account, key, changeAmount, password, expiresIn = null):
+	var url = "/SecureData/Player/Increment/" + account + "/" + key + "/" + password  + "/" + changeAmount
+	if (expiresIn != null):
+		url += "/"+ str(expiresIn)
+	
+	var data = await call_url(url, HTTPClient.METHOD_PUT)
+	return data.get_string_from_utf8()
+
+func IncrementSecureAreaValue(plusCode, key, changeAmount, password, expiresIn = null):
+	var url = "/SecureData/Area/Increment/" + plusCode+ "/" + key + "/" + password + "/" + changeAmount
+	if (expiresIn != null):
+		url += "/"+ str(expiresIn)
+	
+	var data = await call_url(url, HTTPClient.METHOD_PUT)
+	return data.get_string_from_utf8()
+
+#MapTile endpoints API calls. Returns a PNG in byte array format.
+func DrawMapTile(plusCode, styleSet, onlyLayer): #Normal map tiles. styleSet and onlyLayer are optional.
+	var url = '/MapTiles/Area/' + plusCode
+	if (styleSet != null):
+		url += "/" + styleSet
+		if (onlyLayer != null):
+			url += "/" + onlyLayer
+
+	var data = await call_url(url)
+	return data
+	
+	
+func DrawMapTileAreaData(plusCode, styleSet): #loads drawable area data inside the given area.
+	var url = '/MapTiles/AreaData/' + plusCode
+	if (styleSet != null):
+		url += "/" + styleSet
+
+	var data = await call_url(url)
+	return data
+	
+func ExpireTiles(place, styleSet): #expires all map tiles in styleSet that contain place.
+	var url = "/MapTiles/Expire/" + place + "/" + styleSet
+	await call_url(url)
+	
+func GetTileGenerationID(plusCode, styleSet): #Gets the current generation ID (creation count) for a tile. -1 is "expired"
+	var url = "/MapTiles/Generatiion/" + plusCode + "/" + styleSet
+	await call_url(url)
+
+#Demo endpoint API calls, so this can server immediately as a test client.
+
+func DemoSplatterEnter(plusCode): #Grants the player 1 splat point when walking into a Cell10 the first time in 24 hours
+	var url = "/Splatter/Enter/" + plusCode
+	var data = await call_url(url)
+	return data.get_string_from_utf8() #count of current splat points
+	
+func DemoSplatterSplat(plusCode, radius): #Spend points to make a splat of radius (integer) size if player has enough points.
+	var url = "/Splatter/Splat/" + plusCode + "/" + radius
+	await call_url(url)
+	#When done, update 'splatter' maptiles.
+	
+func DemoSplatterTest(plusCode8): #Creates random splats all over the given Cell8. Return the image of the given Cell8 after.
+	var url = "/Splatter/Test/" + plusCode8
+	var data = await call_url(url)
+	return data
+	#When done, update 'splatter' maptiles.
+
+func DemoUnroutineEnter(plusCode): #if at a Place, add it to the Visited list.
+	var url = "/Unroutine/Enter/" + plusCode
+	await call_url(url)
+	
+func DemoUnroutinePickTarget(plusCode):
+	var url = "/Unroutine/Target/" + plusCode
+	var data = await call_url(url, HTTPClient.METHOD_PUT)
+	return data.get_string_from_utf8() #target info JSON
+
+func DemoUnroutineGetCurrentTarget():
+	var url = "/Unroutine/Target"
+	var data = await call_url(url)
+	return data.get_string_from_utf8() #target info JSON
+	
+func DemoUnroutineGetAllVisited():
+	var url = "/Unroutine/Visited"
+	var data = await call_url(url)
+	return data.get_string_from_utf8() #all places JSON
