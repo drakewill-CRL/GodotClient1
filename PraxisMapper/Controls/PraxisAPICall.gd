@@ -1,21 +1,32 @@
 extends Node
+class_name PraxisAPICall
 
 # Based on the HTTPClient demo in the official docs. Used to make getting data a single function call.
 # This simple class can do HTTP requests; it will not block, but it needs to be polled.
 
+#NOTE: this works, but it seems to cause the app to not process anything else while it's running in a scene.
+
 #For a game with a custom plugin, it'll basically want a node that creates an instance of this node,
 #and hits call_url() with the correct parameters, then process the result accordingly and return that.
 var http
+var lastResponseCode #can be checked if this returns null for more info
+var lastError #can be checked if this returns null for more info.
+
+static var _isReauthing = false
+
+signal result(data: Array)
 
 func _init():
 	var err = 0
 	http = HTTPClient.new() # Create the Client.
 
-	if (PraxisMapper.serverURL.contains(":")):
-		var split = PraxisMapper.serverURL.split(":")
+	var split = PraxisMapper.serverURL.split(":")
+	if (split.size() == 3): #http:\\url:port
+		err =  http.connect_to_host(split[0] + ":" + split[1], int(split[2])) # Connect to host/port.
+	elif (split.size() == 2 and !split[0].starts_with("http")): #url:port
 		err =  http.connect_to_host(split[0], int(split[1])) # Connect to host/port.
-	else:
-		err = http.connect_to_host(PraxisMapper.serverURL) # Connect to host/port.
+	else: # url
+		err = http.connect_to_host(PraxisMapper.serverURL)
 
 	assert(err == OK) # Make sure connection is OK.
 	
@@ -27,10 +38,11 @@ func _init():
 		else:
 			await get_tree().process_frame
 
-	print(http.get_status())
 	assert(http.get_status() == HTTPClient.STATUS_CONNECTED) # Check if the connection was made successfully.
 
 func call_url(endpoint, method = HTTPClient.METHOD_GET, body = ''):
+	lastError = ''
+	lastResponseCode = 0
 	# Some headers
 	var headers = [
 		"AuthKey: " + PraxisMapper.authKey,
@@ -43,7 +55,9 @@ func call_url(endpoint, method = HTTPClient.METHOD_GET, body = ''):
 		endpoint = "/" + endpoint
 
 	var err = http.request(method, endpoint, headers, body) # Request a page from the site (this one was chunked..)
-	assert(err == OK) # Make sure all is OK.
+	if (err != OK):
+		lastError = error_string(err)
+		return null
 
 	while http.get_status() == HTTPClient.STATUS_REQUESTING:
 		# Keep polling for as long as the request is being processed.
@@ -56,29 +70,32 @@ func call_url(endpoint, method = HTTPClient.METHOD_GET, body = ''):
 			OS.delay_msec(25)
 
 	assert(http.get_status() == HTTPClient.STATUS_BODY or http.get_status() == HTTPClient.STATUS_CONNECTED) # Make sure request finished well.
+	if (http.get_status() != HTTPClient.STATUS_BODY and http.get_status() != HTTPClient.STATUS_CONNECTED):
+		lastError = "Request Failed: " + http.get_status()
+		return
 
-	#print("response? ", http.has_response()) # Site might not have a response.
-
+	var statusCode = http.get_response_code()
+	lastResponseCode = statusCode
+	if (statusCode == 419):
+		#reauth. TODO: better locking.
+		if (_isReauthing == true):
+			while _isReauthing == true:
+				if OS.has_feature("web"):
+					await get_tree().process_frame
+				else:
+					OS.delay_msec(25)
+		else:		
+			_isReauthing = true
+			await self.Login(PraxisMapper.username, PraxisMapper.password)
+			_isReauthing = false
+		return await call_url(endpoint, method, body)
+	elif(statusCode != 200 and statusCode != 204):
+		lastError = str(statusCode)
+		return "Error: " + str(statusCode)
+	
 	if http.has_response():
-		# If there is a response...
-
-		headers = http.get_response_headers_as_dictionary() # Get response headers.
-		print("code: ", http.get_response_code()) # Show response code.
-		print("**headers:\\n", headers) # Show headers.
-
 		# Getting the HTTP Body
-
-		if http.is_response_chunked():
-			# Does it use chunks?
-			print("Response is Chunked!")
-		else:
-			# Or just plain Content-Length
-			var bl = http.get_response_body_length()
-			print("Response Length: ", bl)
-
-		# This method works for both anyway
 		var rb = PackedByteArray() # Array that will hold the data.
-
 		while http.get_status() == HTTPClient.STATUS_BODY:
 			# While there is body left to be read
 			http.poll()
@@ -93,11 +110,11 @@ func call_url(endpoint, method = HTTPClient.METHOD_GET, body = ''):
 			else:
 				rb = rb + chunk # Append to read buffer.
 		# Done!
-
-		#print("bytes got: ", rb.size())
-		var text = rb.get_string_from_utf8()
-		#print("Text: ", text)
+		
+		result.emit(rb) # an alternate way to get this info, but may not work if this node is shared.
 		return rb #Let the caller decode this data the way they expect to have it.
+	
+	return true
 
 #Pre-made calls for stock endpoints
 #/Server controller APIs
@@ -274,7 +291,7 @@ func IncrementSecureAreaValue(plusCode, key, changeAmount, password, expiresIn =
 
 #MapTile endpoints API calls. Returns a PNG in byte array format.
 func DrawMapTile(plusCode, styleSet, onlyLayer): #Normal map tiles. styleSet and onlyLayer are optional.
-	var url = '/MapTiles/Area/' + plusCode
+	var url = '/MapTile/Area/' + plusCode
 	if (styleSet != null):
 		url += "/" + styleSet
 		if (onlyLayer != null):
@@ -283,9 +300,8 @@ func DrawMapTile(plusCode, styleSet, onlyLayer): #Normal map tiles. styleSet and
 	var data = await call_url(url)
 	return data
 	
-	
 func DrawMapTileAreaData(plusCode, styleSet): #loads drawable area data inside the given area.
-	var url = '/MapTiles/AreaData/' + plusCode
+	var url = '/MapTile/AreaData/' + plusCode
 	if (styleSet != null):
 		url += "/" + styleSet
 
@@ -293,11 +309,11 @@ func DrawMapTileAreaData(plusCode, styleSet): #loads drawable area data inside t
 	return data
 	
 func ExpireTiles(place, styleSet): #expires all map tiles in styleSet that contain place.
-	var url = "/MapTiles/Expire/" + place + "/" + styleSet
+	var url = "/MapTile/Expire/" + place + "/" + styleSet
 	await call_url(url)
 	
 func GetTileGenerationID(plusCode, styleSet): #Gets the current generation ID (creation count) for a tile. -1 is "expired"
-	var url = "/MapTiles/Generatiion/" + plusCode + "/" + styleSet
+	var url = "/MapTile/Generatiion/" + plusCode + "/" + styleSet
 	await call_url(url)
 
 #Demo endpoint API calls, so this can server immediately as a test client.

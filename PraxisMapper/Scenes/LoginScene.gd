@@ -5,12 +5,15 @@ extends Node2D
 @onready var txtServer: LineEdit = $txtServer
 @onready var lblError: Label = $lblError
 @onready var request: HTTPRequest = $HTTPRequest
+@onready var timer: Timer = $Timer
 
+var api: PraxisAPICall
+@onready var api2: GenericCall = $GenericCall
 #TODO: move passkey to a variable and change it.
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	#TODO: check for saved credentials, set into textboxes if found.
+	#TODO: check for saved credentials, set into textboxes if found.	
 	var lastData = FileAccess.open_encrypted_with_pass("user://savedData.access", FileAccess.READ, "passkeyGoesHere")
 	if (lastData != null):
 		var data = lastData.get_as_text().split("|")
@@ -20,13 +23,38 @@ func _ready():
 		txtUsername.text = data[0]
 		txtPassword.text = data[1]
 		txtServer.text = data[2]
-		_on_btn_login_pressed()
+		#Original made the call directly in this class
+		#_on_btn_login_pressed()
+		#First API setup calls here but the screen wont draw while its processing
+		#timer.timeout.connect(_on_btn_login_pressed)
+		#timer.start(.1)
+		
+		#second API setup, should let screen draw while waiting?
+		api2.response_data.connect(login_completed2)
+		api2.Login(data[2], txtUsername.text, txtPassword.text)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass
-
+	
+func login_completed2(result):
+	request.request_completed.disconnect(login_completed2)
+	var json = JSON.new()
+	json.parse(result.get_string_from_utf8())
+	var data = json.get_data()
+	print(data)
+	#if successful, save name/pwd/server to file to load as auto-login next time.
+	var authData = FileAccess.open_encrypted_with_pass("user://savedData.access", FileAccess.WRITE, "passkeyGoesHere")
+	authData.store_string(txtUsername.text + "|" + txtPassword.text + "|" +txtServer.text)
+	authData.close()
+	
+	PraxisMapper.username = txtUsername.text
+	PraxisMapper.password = txtPassword.text
+	PraxisMapper.serverURL = txtServer.text
+	PraxisMapper.authKey = data.authToken
+	
+	get_tree().change_scene_to_file("res://Scenes/OverheadView.tscn")
 
 func login_completed(result, response_code, headers, body):
 	request.request_completed.disconnect(login_completed)
@@ -55,6 +83,20 @@ func login_completed(result, response_code, headers, body):
 	PraxisMapper.password = txtPassword.text
 	PraxisMapper.serverURL = txtServer.text
 	PraxisMapper.authKey = data.authToken
+	
+	#testing out new calls
+	api = await PraxisAPICall.new()
+	#These work
+	#var test1 = await api.DrawMapTile("86HWGGGP", null, null)
+	#var test2 = await api.ServerTest()
+	
+	#this needs slightly different logic, or to wait?
+	var test3 = await api.Login(txtUsername.text, txtPassword.text)
+	print(test3)
+
+	
+	
+	
 	#Now, change to the post-login scene here.
 	#get_tree().change_scene_to_file("res://Scenes/GpsTest.tscn")
 	#get_tree().change_scene_to_file("res://Scenes/test1.tscn")
@@ -64,22 +106,59 @@ func _on_btn_login_pressed():
 	#here is where login logic goes.
 	print("login pressed")
 	lblError.text = "Logging in...."
-	request.request_completed.connect(login_completed)
+	#Trying with the new node:	
 	
-	var call = request.request(txtServer.text + "/Server/Login/" + txtUsername.text + "/" + txtPassword.text)
-	if (call != OK):
-		pass #Todo see if this is necessary or can be handled in the complete call.
+	PraxisMapper.serverURL = txtServer.text
+	print(txtServer.text)
+	
+	api = await PraxisAPICall.new()
+	var results = await api.Login(txtUsername.text, txtPassword.text)
+	
+	var json = JSON.new()
+	json.parse(results)
+	var data = json.get_data()
+	print(data)
+	#if successful, save name/pwd/server to file to load as auto-login next time.
+	var authData = FileAccess.open_encrypted_with_pass("user://savedData.access", FileAccess.WRITE, "passkeyGoesHere")
+	authData.store_string(txtUsername.text + "|" + txtPassword.text + "|" +txtServer.text)
+	authData.close()
+	
+	PraxisMapper.username = txtUsername.text
+	PraxisMapper.password = txtPassword.text
+	PraxisMapper.serverURL = txtServer.text
+	PraxisMapper.authKey = data.authToken
+	
+	#Now, change to the post-login scene here.
+	#get_tree().change_scene_to_file("res://Scenes/GpsTest.tscn")
+	#get_tree().change_scene_to_file("res://Scenes/test1.tscn")
+	get_tree().change_scene_to_file("res://Scenes/OverheadView.tscn")
+	
+	#OG way
+	#request.request_completed.connect(login_completed)
+	
+	#var call = request.request(txtServer.text + "/Server/Login/" + txtUsername.text + "/" + txtPassword.text)
+	#if (call != OK):
+		#pass #Todo see if this is necessary or can be handled in the complete call.
 
 
 func _on_btn_create_acct_pressed():
 	print("create pressed")
 	lblError.text = "Creating account...."
-	request.request_completed.connect(createCompleted)
 	
-	var call = request.request(txtServer.text + "/Server/CreateAccount/" + txtUsername.text + "/" + txtPassword.text, 
-	[], HTTPClient.METHOD_PUT)
-	if (call != OK):
-		pass #Todo see if this is necessary or can be handled in the complete call.
+	api = await PraxisAPICall.new()
+	var results = await api.CreateAccount(txtUsername.text, txtPassword.text)
+	
+	if (results == true):
+		_on_btn_login_pressed()
+	else:
+		print("Create failed")
+	
+	#request.request_completed.connect(createCompleted)
+	
+	#var call = request.request(txtServer.text + "/Server/CreateAccount/" + txtUsername.text + "/" + txtPassword.text, 
+	#[], HTTPClient.METHOD_PUT)
+	#if (call != OK):
+		#pass #Todo see if this is necessary or can be handled in the complete call.
 
 func createCompleted(result, response_code, _headers, body):
 	request.request_completed.disconnect(createCompleted)
