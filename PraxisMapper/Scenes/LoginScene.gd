@@ -6,8 +6,6 @@ extends Node2D
 @onready var lblError: Label = $lblError
 @onready var request: HTTPRequest = $HTTPRequest
 @onready var timer: Timer = $Timer
-
-var api: PraxisAPICall
 @onready var api2: GenericCall = $GenericCall
 #TODO: move passkey to a variable and change it.
 
@@ -23,28 +21,28 @@ func _ready():
 		txtUsername.text = data[0]
 		txtPassword.text = data[1]
 		txtServer.text = data[2]
-		#Original made the call directly in this class
-		#_on_btn_login_pressed()
-		#First API setup calls here but the screen wont draw while its processing
-		#timer.timeout.connect(_on_btn_login_pressed)
-		#timer.start(.1)
 		
-		#second API setup, should let screen draw while waiting?
-		api2.response_data.connect(login_completed2)
-		api2.Login(data[2], txtUsername.text, txtPassword.text)
+		_on_btn_login_pressed()
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
+func _on_btn_login_pressed():
+	print("login pressed")
+	lblError.text = "Logging in...."
 	
-func login_completed2(result):
-	request.request_completed.disconnect(login_completed2)
+	PraxisMapper.serverURL = txtServer.text
+	api2.response_data.connect(login_completed)
+	api2.Login('', txtUsername.text, txtPassword.text)
+
+func login_completed(result):
+	request.request_completed.disconnect(login_completed)
+	if (typeof(result) == TYPE_STRING and result == "ERROR"):
+		lblError.text = "Error logging in"
+		return
+		
 	var json = JSON.new()
 	json.parse(result.get_string_from_utf8())
 	var data = json.get_data()
 	print(data)
-	#if successful, save name/pwd/server to file to load as auto-login next time.
+	#if successful, save name/pwd/server to file to load as auto-login next time. #NOTE: may use ConfigFile for this specifically.
 	var authData = FileAccess.open_encrypted_with_pass("user://savedData.access", FileAccess.WRITE, "passkeyGoesHere")
 	authData.store_string(txtUsername.text + "|" + txtPassword.text + "|" +txtServer.text)
 	authData.close()
@@ -55,120 +53,25 @@ func login_completed2(result):
 	PraxisMapper.authKey = data.authToken
 	
 	get_tree().change_scene_to_file("res://Scenes/OverheadView.tscn")
-
-func login_completed(result, response_code, headers, body):
-	request.request_completed.disconnect(login_completed)
-	print("login complete")
-	print(response_code)
-	print(body)
-	
-	if (response_code == 0):
-		lblError.text = "Login Failed: No response from server"
-		return
-	
-	if (response_code > 299):
-		lblError.text = "Login Failed: " +  str(response_code) + " " + body
-		return
-	
-	var json = JSON.new()
-	json.parse(body.get_string_from_utf8())
-	var data = json.get_data()
-	print(data)
-	#if successful, save name/pwd/server to file to load as auto-login next time.
-	var authData = FileAccess.open_encrypted_with_pass("user://savedData.access", FileAccess.WRITE, "passkeyGoesHere")
-	authData.store_string(txtUsername.text + "|" + txtPassword.text + "|" +txtServer.text)
-	authData.close()
-	
-	PraxisMapper.username = txtUsername.text
-	PraxisMapper.password = txtPassword.text
-	PraxisMapper.serverURL = txtServer.text
-	PraxisMapper.authKey = data.authToken
-	
-	#testing out new calls
-	api = await PraxisAPICall.new()
-	#These work
-	#var test1 = await api.DrawMapTile("86HWGGGP", null, null)
-	#var test2 = await api.ServerTest()
-	
-	#this needs slightly different logic, or to wait?
-	var test3 = await api.Login(txtUsername.text, txtPassword.text)
-	print(test3)
-
-	
-	
-	
-	#Now, change to the post-login scene here.
-	#get_tree().change_scene_to_file("res://Scenes/GpsTest.tscn")
-	#get_tree().change_scene_to_file("res://Scenes/test1.tscn")
-	get_tree().change_scene_to_file("res://Scenes/OverheadView.tscn")
-
-func _on_btn_login_pressed():
-	#here is where login logic goes.
-	print("login pressed")
-	lblError.text = "Logging in...."
-	#Trying with the new node:	
-	
-	PraxisMapper.serverURL = txtServer.text
-	print(txtServer.text)
-	
-	api = await PraxisAPICall.new()
-	var results = await api.Login(txtUsername.text, txtPassword.text)
-	
-	var json = JSON.new()
-	json.parse(results)
-	var data = json.get_data()
-	print(data)
-	#if successful, save name/pwd/server to file to load as auto-login next time.
-	var authData = FileAccess.open_encrypted_with_pass("user://savedData.access", FileAccess.WRITE, "passkeyGoesHere")
-	authData.store_string(txtUsername.text + "|" + txtPassword.text + "|" +txtServer.text)
-	authData.close()
-	
-	PraxisMapper.username = txtUsername.text
-	PraxisMapper.password = txtPassword.text
-	PraxisMapper.serverURL = txtServer.text
-	PraxisMapper.authKey = data.authToken
-	
-	#Now, change to the post-login scene here.
-	#get_tree().change_scene_to_file("res://Scenes/GpsTest.tscn")
-	#get_tree().change_scene_to_file("res://Scenes/test1.tscn")
-	get_tree().change_scene_to_file("res://Scenes/OverheadView.tscn")
-	
-	#OG way
-	#request.request_completed.connect(login_completed)
-	
-	#var call = request.request(txtServer.text + "/Server/Login/" + txtUsername.text + "/" + txtPassword.text)
-	#if (call != OK):
-		#pass #Todo see if this is necessary or can be handled in the complete call.
-
 
 func _on_btn_create_acct_pressed():
 	print("create pressed")
 	lblError.text = "Creating account...."
-	
-	api = await PraxisAPICall.new()
-	var results = await api.CreateAccount(txtUsername.text, txtPassword.text)
-	
-	if (results == true):
-		_on_btn_login_pressed()
-	else:
-		print("Create failed")
-	
-	#request.request_completed.connect(createCompleted)
-	
-	#var call = request.request(txtServer.text + "/Server/CreateAccount/" + txtUsername.text + "/" + txtPassword.text, 
-	#[], HTTPClient.METHOD_PUT)
-	#if (call != OK):
-		#pass #Todo see if this is necessary or can be handled in the complete call.
+	PraxisMapper.serverURL = txtServer.text
+	api2.response_data.connect(createCompleted)
+	api2.CreateAccount(txtUsername.text, txtPassword.text)
 
-func createCompleted(result, response_code, _headers, body):
+func createCompleted(result):
 	request.request_completed.disconnect(createCompleted)
-	print("create complete")
-	print(response_code)
-	print(body)
+	if (typeof(result) == TYPE_STRING and result == "ERROR"):
+		lblError.text = "Account creation failed."
+		return
+		
 	var json = JSON.new()
-	json.parse(body.get_string_from_utf8())
+	json.parse(result.get_string_from_utf8())
 	var data = json.get_data()
-	if (data == true):
+	print(data)
+	if (data == true): #
 		_on_btn_login_pressed()
 	else:
-		print("Create failed")
+		lblError.text = "Account creation failed."

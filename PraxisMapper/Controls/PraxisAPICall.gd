@@ -1,6 +1,10 @@
 extends Node
 class_name PraxisAPICall
 
+#This function works in a single call, but the UI tends not to update while this is running, so we
+#dont really want to use this one too much.
+
+
 # Based on the HTTPClient demo in the official docs. Used to make getting data a single function call.
 # This simple class can do HTTP requests; it will not block, but it needs to be polled.
 
@@ -18,12 +22,12 @@ signal result(data: Array)
 
 func _init():
 	var err = 0
-	http = HTTPClient.new() # Create the Client.
+	http = HTTPClient.new() # Create the Client. 
 
 	var split = PraxisMapper.serverURL.split(":")
 	if (split.size() == 3): #http:\\url:port
 		err =  http.connect_to_host(split[0] + ":" + split[1], int(split[2])) # Connect to host/port.
-	elif (split.size() == 2 and !split[0].starts_with("http")): #url:port
+	elif (split.size() == 2 and !split[0].begins_with("http")): #url:port
 		err =  http.connect_to_host(split[0], int(split[1])) # Connect to host/port.
 	else: # url
 		err = http.connect_to_host(PraxisMapper.serverURL)
@@ -38,6 +42,7 @@ func _init():
 		else:
 			await get_tree().process_frame
 
+	print(http.get_status())
 	assert(http.get_status() == HTTPClient.STATUS_CONNECTED) # Check if the connection was made successfully.
 
 func call_url(endpoint, method = HTTPClient.METHOD_GET, body = ''):

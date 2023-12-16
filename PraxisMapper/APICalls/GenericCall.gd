@@ -1,6 +1,8 @@
 extends Node2D
 class_name GenericCall
 
+#THIS is the main class I want to use for performance reasons. Rename this to be more clear its the 
+#real PraxisAPI setup, and remove/rename the other one.
 @onready var request: HTTPRequest = $HTTPRequest
 #this version is going to use signals insted of waiting for a response in a single call.
 #this will let other things process more reliably, so I think this is more likely to be the setup
@@ -10,10 +12,13 @@ signal response_data(body)
 
 func response_received(result, responseCode, headers, body):
 	#TODO: automatic reauth if possible.
-	print('response received')
+	print('response received:' + str(responseCode) + "| " + str(result))
+
 	request.request_completed.disconnect(response_received)
 	if responseCode >= 200 and responseCode < 299:
 		response_data.emit(body)
+	else:
+		response_data.emit("ERROR")
 
 func callEndpoint(url, method = null, body = null):
 	var headers = [
@@ -24,8 +29,18 @@ func callEndpoint(url, method = null, body = null):
 	]
 	if (method == null):
 		method = HTTPClient.METHOD_GET
+	elif (method == HTTPClient.METHOD_PUT):
+		if body != null:
+			headers.append("Content-Length: " + body.size())
+		else:
+			headers.append("Content-Length: 0")
 	request.request_completed.connect(response_received)
-	var ok = request.request(PraxisMapper.serverURL + url, headers, method, body)
+	var ok
+	if (body != null): 
+		ok = request.request(PraxisMapper.serverURL + url, headers, method, body)
+	else:
+
+		ok = request.request(PraxisMapper.serverURL + url, headers, method)
 	print(PraxisMapper.serverURL + url)
 	print('request called')
 	
@@ -167,7 +182,7 @@ func IncrementSecureAreaValue(plusCode, key, changeAmount, password, expiresIn =
 	callEndpoint(url, HTTPClient.METHOD_PUT)
 
 #MapTile endpoints API calls. Returns a PNG in byte array format.
-func DrawMapTile(plusCode, styleSet, onlyLayer): #Normal map tiles. styleSet and onlyLayer are optional.
+func DrawMapTile(plusCode, styleSet, onlyLayer = null): #Normal map tiles. styleSet and onlyLayer are optional.
 	var url = '/MapTile/Area/' + plusCode
 	if (styleSet != null):
 		url += "/" + styleSet
