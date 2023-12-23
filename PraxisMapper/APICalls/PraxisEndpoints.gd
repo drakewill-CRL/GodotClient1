@@ -1,12 +1,9 @@
 extends Node2D
-class_name GenericCall
+class_name PraxisEndpoints
 
-#THIS is the main class I want to use for performance reasons. Rename this to be more clear its the 
-#real PraxisAPI setup, and remove/rename the other one.
 @onready var request: HTTPRequest = $HTTPRequest
-#this version is going to use signals insted of waiting for a response in a single call.
-#this will let other things process more reliably, so I think this is more likely to be the setup
-#that I end up going with.
+#this version uses signals insted of waiting for a response in a single call.
+#this will let other things process more reliably and is the better design pattern to follow.
 
 signal response_data(body)
 
@@ -42,6 +39,8 @@ func callEndpoint(url, method = null, body = null):
 		ok = request.request(PraxisMapper.serverURL + url, headers, method)
 	print(PraxisMapper.serverURL + url)
 	print('request called')
+	
+	#TODO: check if OK isn't OK and handle pre-call errors.
 	
 	#this probably doesn't work. ACTUALLY - it might, possibly needs to be self.response_received
 	#var results = await response_received

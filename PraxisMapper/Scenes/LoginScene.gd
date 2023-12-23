@@ -6,7 +6,7 @@ extends Node2D
 @onready var lblError: Label = $lblError
 @onready var request: HTTPRequest = $HTTPRequest
 @onready var timer: Timer = $Timer
-@onready var api2: GenericCall = $GenericCall
+@onready var api2: PraxisEndpoints = $PraxisEndpoints
 #TODO: move passkey to a variable and change it.
 
 # Called when the node enters the scene tree for the first time.

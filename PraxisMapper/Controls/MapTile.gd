@@ -1,9 +1,9 @@
 extends Node2D
 
 #This one loads up and displays a map tile.
-#TODO declare components separately, start with static texture until image is loaded
+#TODO declare components separately, start with static texture until image is loaded?
 
-@onready var request: GenericCall = $GenericCall
+@onready var request: PraxisEndpoints = $PraxisEndpoints
 @onready var texRect: TextureRect = $TextureRect
 @onready var timer: Timer = $Timer
 
@@ -26,27 +26,6 @@ func getTappedCode(x, y):
 	var tappedCell = PlusCodes.ShiftCode(currentTile + "22", x / cellsX, (400 - y) / cellsY )
 	return tappedCell
 
-#The function to detect user taps.
-#TODO: this makes all mapTiles fire off the check on tap. Need to limit that to the tapped one
-#maybe thats handled by the parent scene?
-func _input_event(event):
-	if event is InputEventScreenTouch and event.is_pressed() == true:
-		
-		#future possibility:
-		# check get_rect() in parent for each child maptile against to_local(event.position.x/y)
-		
-		#now work out which plusCode was tapped
-		var innerX =  int(event.position.x) % PraxisMapper.mapTileWidth # - position.x
-		var innerY =  int(event.position.y) % PraxisMapper.mapTileHeight #- position.y
-		
-		#innerX/Y should now be the pixel inside this control we tapped.
-		#and this map tile is a Cell8, so we can work it out to a Cell11 accuracy
-		var cellsX = PraxisMapper.mapTileWidth / 80
-		var cellsY = PraxisMapper.mapTileHeight / 100
-		
-		var tappedCell = PlusCodes.ShiftCode(currentTile + "22", innerX / cellsX, innerY / cellsY )
-		print(tappedCell)
-		
 func GetTileGeneration():
 	#This will call the tile generation ID api to see if the one on the server is different from the
 	#one on the device and if so, get the server's version.

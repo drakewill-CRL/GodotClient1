@@ -1,8 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://8os6eof5qcbh"]
-
-[ext_resource type="Script" path="res://PraxisMapper/APICalls/GenericCall.gd" id="1_gn8yx"]
-
-[node name="GenericCall" type="Node2D"]
-script = ExtResource("1_gn8yx")
-
-[node name="HTTPRequest" type="HTTPRequest" parent="."]

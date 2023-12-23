@@ -2,7 +2,8 @@ extends Node
 class_name PraxisAPICall
 
 #This function works in a single call, but the UI tends not to update while this is running, so we
-#dont really want to use this one too much.
+#dont really want to use this one too much. In most cases you will want to use PraxisEndpoints instead
+#of this class, but it remains here for now as an alternative.
 
 
 # Based on the HTTPClient demo in the official docs. Used to make getting data a single function call.

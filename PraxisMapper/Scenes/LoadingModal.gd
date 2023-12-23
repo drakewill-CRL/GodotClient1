@@ -1,5 +1,7 @@
 extends Node2D
 
+#A default input-blocking 
+
 @onready var spinner: Sprite2D = $ColorRect/Spinner
 
 # Called when the node enters the scene tree for the first time.
@@ -11,6 +13,7 @@ func _process(delta):
 	if (self.visible == true):
 		spinner.rotation += (delta * 10 * sin(Time.get_unix_time_from_system()))
 
+#TODO: this may need to extend Control and make this _gui_input instead?
 func _unhandled_input(event):
 	#this is what this is listening for to block touches cascading down farther.
 	#TODO: if this node is shown/hidden, this needs to check that state.

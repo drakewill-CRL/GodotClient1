@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://byuoc420a66nc"]
 
 [ext_resource type="Script" path="res://PraxisMapper/Scenes/LoginScene.gd" id="1_xhe06"]
-[ext_resource type="PackedScene" uid="uid://8os6eof5qcbh" path="res://PraxisMapper/APICalls/GenericCall.tscn" id="2_xm5lo"]
+[ext_resource type="PackedScene" uid="uid://8os6eof5qcbh" path="res://PraxisMapper/APICalls/PraxisEndpoints.tscn" id="2_xm5lo"]
 
 [node name="LoginScene" type="Node2D"]
 script = ExtResource("1_xhe06")
@@ -90,7 +90,7 @@ theme_override_font_sizes/font_size = 50
 
 [node name="Timer" type="Timer" parent="."]
 
-[node name="GenericCall" parent="." instance=ExtResource("2_xm5lo")]
+[node name="PraxisEndpoints" parent="." instance=ExtResource("2_xm5lo")]
 
 [connection signal="pressed" from="btnLogin" to="." method="_on_btn_login_pressed"]
 [connection signal="pressed" from="btnCreateAcct" to="." method="_on_btn_create_acct_pressed"]
