@@ -32,6 +32,9 @@ func getTappedCode(x, y):
 func _input_event(event):
 	if event is InputEventScreenTouch and event.is_pressed() == true:
 		
+		#future possibility:
+		# check get_rect() in parent for each child maptile against to_local(event.position.x/y)
+		
 		#now work out which plusCode was tapped
 		var innerX =  int(event.position.x) % PraxisMapper.mapTileWidth # - position.x
 		var innerY =  int(event.position.y) % PraxisMapper.mapTileHeight #- position.y
@@ -74,6 +77,7 @@ func tile_called(result):
 	
 	var texture = ImageTexture.create_from_image(image)
 	texRect.texture = texture
+	#texRect.size.x *= 2 #note on where i might resize these.
 	
 func LoadTile(plusCode):
 	#this loads the image for the plusCode given. GetTile shifts appropriately for offsets automatically.

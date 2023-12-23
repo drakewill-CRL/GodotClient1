@@ -4,6 +4,9 @@ class_name PraxisMapper
 #NOTE: PraxisMapper is the class name for static values.
 #For the singleton instance in autoload, use PraxisCore
 
+#Current limitation: this app asks for permissions on first launch. If granted, it needs restarted
+#before GPS will work correctly.
+
 # Values used for login/auth and server comms
 static var username = ''
 static var password = ''
@@ -64,17 +67,37 @@ static func reauth():
 
 func on_monitoring_location_result(location: Dictionary) -> void:
 	location_changed.emit(location)
+	print("location changed" + str(location))
 	var plusCode = PlusCodes.EncodeLatLon(location["latitude"], location["longitude"])
 	if (plusCode != currentPlusCode):
 		lastPlusCode = currentPlusCode
 		currentPlusCode = plusCode
 		plusCode_changed.emit(currentPlusCode, lastPlusCode)
+		print("new plusCode: " + plusCode)
+		
+func perm_check(granted):
+	print("permissions: " + granted)
+	gps_provider.on_monitoring_location_result.connect(on_monitoring_location_result)
+	gps_provider.start_monitoring(gps_provider.get_accuracy_high(), 500, 0.5, true)
 
 func _ready():
 	DirAccess.make_dir_absolute("user://MapTiles")
 	gps_provider = Engine.get_singleton("GodotAndroidGpsProvider")
 	if gps_provider != null:
-		gps_provider.on_monitoring_location_result.connect(on_monitoring_location_result)
+		#TODO: GPS location currently works. GPS Permisisons currently do NOT. Needs manually enabled.
+		#gps_provider.on_request_precise_gps_result.connect(perm_check)
+		#gps_provider.request_precise_gps_permission()
+		var allowed = OS.request_permissions()
+		if (allowed == true): #permissions were granted on a previous run.
+			print("allowed")
+			gps_provider.on_monitoring_location_result.connect(on_monitoring_location_result)
+			gps_provider.start_monitoring(gps_provider.get_accuracy_high(), 500, 0.5, true)
+			#print('requesting permissions')
+		else: #we had to ask for permissions, logic kept running.
+			print("no permissions yet.")
+			#TODO: loop/check until we do have permissions? Or inform user they need to grant?
+			
+		#print('perm request sent')
 	else:
 		print("GPS Provider not loaded (probably debugging on PC)")
 		currentPlusCode = debugStartingPlusCode
@@ -84,4 +107,3 @@ func _ready():
 		debugControls.position.x = 0
 		debugControls.position.y = 0
 		debugControls.z_index = 200
-

@@ -67,13 +67,10 @@ func _ready():
 	
 	PraxisCore.plusCode_changed.connect(CameraScroll)
 	CameraScroll(PraxisMapper.currentPlusCode, "")
-	
-func _process(delta):
-	#camera.position.x -= 1
-	pass
-	
+
 func CameraScroll(currentPlusCode, previousPlusCode):
 	print("scrolling camera to " + currentPlusCode)
+	currentPlusCode = PlusCodes.RemovePlus(currentPlusCode)
 	var currentXPos = currentPlusCode.substr(9,1)
 	var xIndex = PlusCodes.CODE_ALPHABET_.find(currentXPos)
 	var xShift = (PraxisMapper.mapTileWidth / 2) -  (PraxisMapper.mapTileWidth / 20) * xIndex

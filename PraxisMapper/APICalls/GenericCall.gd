@@ -39,7 +39,6 @@ func callEndpoint(url, method = null, body = null):
 	if (body != null): 
 		ok = request.request(PraxisMapper.serverURL + url, headers, method, body)
 	else:
-
 		ok = request.request(PraxisMapper.serverURL + url, headers, method)
 	print(PraxisMapper.serverURL + url)
 	print('request called')
