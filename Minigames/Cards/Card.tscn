@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://ocl76w841bv1"]
+
+[ext_resource type="Script" path="res://Minigames/Cards/Card.gd" id="1_rm2ey"]
+
+[node name="Card" type="Node2D"]
+script = ExtResource("1_rm2ey")

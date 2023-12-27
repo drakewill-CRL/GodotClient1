@@ -1,0 +1,44 @@
+[gd_scene load_steps=5 format=3 uid="uid://deje3ijbq3w3n"]
+
+[ext_resource type="Theme" uid="uid://ddx6rbnromxn" path="res://UIScenes/SciFiLayout.tres" id="1_hlc6r"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_blcvj"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c5qt7"]
+bg_color = Color(0.439216, 0, 0.192157, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q2qa5"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="SciFiLayout" type="Node2D"]
+
+[node name="Panel2" type="Panel" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_blcvj")
+
+[node name="Panel" type="Panel" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+theme = ExtResource("1_hlc6r")
+theme_override_styles/panel = SubResource("StyleBoxFlat_c5qt7")
+
+[node name="Panel" type="Panel" parent="Panel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 50.0
+offset_bottom = 50.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_q2qa5")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+anchor_mode = 0

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cu6hg7rbs1vqp"]
+
+[ext_resource type="Script" path="res://Minigames/Cards/Blackjack/Blackjack.gd" id="1_jbvss"]
+
+[node name="Blackjack" type="Node2D"]
+script = ExtResource("1_jbvss")
