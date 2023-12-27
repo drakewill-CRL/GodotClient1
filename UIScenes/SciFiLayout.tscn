@@ -1,5 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://deje3ijbq3w3n"]
+[gd_scene load_steps=6 format=3 uid="uid://deje3ijbq3w3n"]
 
+[ext_resource type="Script" path="res://UIScenes/SciFiLayout.gd" id="1_fdukl"]
 [ext_resource type="Theme" uid="uid://ddx6rbnromxn" path="res://UIScenes/SciFiLayout.tres" id="1_hlc6r"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_blcvj"]
@@ -7,38 +8,49 @@ bg_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c5qt7"]
 bg_color = Color(0.439216, 0, 0.192157, 1)
-corner_radius_top_left = 10
+corner_radius_top_left = 25
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q2qa5"]
-bg_color = Color(0, 0, 0, 1)
-corner_radius_top_left = 10
+bg_color = Color(0.133333, 0.12549, 0.203922, 1)
+corner_radius_top_left = 38
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
 [node name="SciFiLayout" type="Node2D"]
+script = ExtResource("1_fdukl")
 
-[node name="Panel2" type="Panel" parent="."]
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="BgPanel" type="Panel" parent="."]
+offset_right = 1080.0
+offset_bottom = 1920.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_blcvj")
 
-[node name="Panel" type="Panel" parent="."]
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="UIFrame1" type="CanvasLayer" parent="."]
+
+[node name="FrameRect" type="Panel" parent="UIFrame1"]
+offset_right = 1090.0
+offset_bottom = 1930.0
 theme = ExtResource("1_hlc6r")
 theme_override_styles/panel = SubResource("StyleBoxFlat_c5qt7")
 
-[node name="Panel" type="Panel" parent="Panel"]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 10.0
-offset_right = 50.0
-offset_bottom = 50.0
+[node name="CanvasModulate" type="CanvasModulate" parent="UIFrame1/FrameRect"]
+
+[node name="Timer" type="Timer" parent="UIFrame1/FrameRect"]
+
+[node name="CanvasLayer2" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="bgColorRect" type="Panel" parent="CanvasLayer2"]
+offset_left = 40.0
+offset_top = 40.0
+offset_right = 1120.0
+offset_bottom = 1960.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_q2qa5")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 0
+
+[connection signal="timeout" from="UIFrame1/FrameRect/Timer" to="." method="pick_and_shift"]

@@ -64,8 +64,3 @@ func _ready():
 	
 	for l in locations:
 		mineNodes[l.x][l.y].isMine = true
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass

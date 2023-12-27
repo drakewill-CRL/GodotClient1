@@ -39,9 +39,14 @@ static func _static_init():
 			deck.append({suit: suit, value: value})
 	base_deck = deck
 
-func init(card_suit: int, card_value: int):
+func init(card_suit: int, card_value: int, face_up:bool = true):
 	cardSuit = card_suit
 	cardValue = card_value
+	faceUp = face_up
+	
+func _ready():
+	#TODO: 
+	pass
 	
 func flip():
 	faceUp = !faceUp

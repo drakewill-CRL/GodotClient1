@@ -1,0 +1,30 @@
+[gd_scene load_steps=4 format=3 uid="uid://dctkc6qp0qwxt"]
+
+[ext_resource type="Script" path="res://UIScenes/ColorShiftButton.gd" id="1_3eq7g"]
+
+[sub_resource type="Theme" id="Theme_jwr2r"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hbdtv"]
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+corner_detail = 4
+
+[node name="ColorShiftButton" type="Node2D"]
+script = ExtResource("1_3eq7g")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="Panel" parent="CanvasLayer"]
+offset_right = 210.0
+offset_bottom = 98.0
+theme = SubResource("Theme_jwr2r")
+theme_override_styles/panel = SubResource("StyleBoxFlat_hbdtv")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="CanvasLayer/Panel"]
+color = Color(1, 0, 0.0235294, 1)
+
+[node name="Timer" type="Timer" parent="."]
+
+[connection signal="timeout" from="Timer" to="." method="pick_and_shift"]
