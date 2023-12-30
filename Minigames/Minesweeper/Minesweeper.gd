@@ -8,14 +8,18 @@ var padding_px = 2
 var node_size_px = 40
 var margin_x = 10
 var margin_y = 10
+var is_active = true
 
 func node_opened(minenode: MineNode):
 	#This handles logic on which sub-tile was tapped.
 	print("Tapped mine " + str(minenode.xPos) + "," + str(minenode.yPos))
+	if is_active == false:
+		return
 	
 	if (minenode.isMine == true):
 		minenode.set_text("X")
-		#lose.
+		is_active = false
+		#lose. TODO additional game logic and results.
 	else:
 		#count neighbors and update label
 		var neighborCount = 0

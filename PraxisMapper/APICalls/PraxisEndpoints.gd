@@ -9,7 +9,7 @@ signal response_data(body)
 
 func response_received(result, responseCode, headers, body):
 	#TODO: automatic reauth if possible.
-	print('response received:' + str(responseCode) + "| " + str(result))
+	#print('response received:' + str(responseCode) + "| " + str(result))
 
 	request.request_completed.disconnect(response_received)
 	if responseCode >= 200 and responseCode < 299:
@@ -38,7 +38,7 @@ func callEndpoint(url, method = null, body = null):
 	else:
 		ok = request.request(PraxisMapper.serverURL + url, headers, method)
 	print(PraxisMapper.serverURL + url)
-	print('request called')
+	#print('request called')
 	
 	#TODO: check if OK isn't OK and handle pre-call errors.
 	
@@ -198,14 +198,14 @@ func ExpireTiles(place, styleSet): #expires all map tiles in styleSet that conta
 	callEndpoint("/MapTile/Expire/" + place + "/" + styleSet)
 	
 func GetTileGenerationID(plusCode, styleSet): #Gets the current generation ID (creation count) for a tile. -1 is "expired"
-	callEndpoint("/MapTile/Generatiion/" + plusCode + "/" + styleSet)
+	callEndpoint("/MapTile/Generation/" + plusCode + "/" + styleSet)
 
 #Demo endpoint API calls, so this can server immediately as a test client.
 func DemoSplatterEnter(plusCode): #Grants the player 1 splat point when walking into a Cell10 the first time in 24 hours
-	callEndpoint("/Splatter/Enter/" + plusCode)
+	callEndpoint("/Splatter/Enter/" + plusCode, HTTPClient.METHOD_PUT)
 	
 func DemoSplatterSplat(plusCode, radius): #Spend points to make a splat of radius (integer) size if player has enough points.
-	callEndpoint("/Splatter/Splat/" + plusCode + "/" + radius)
+	callEndpoint("/Splatter/Splat/" + plusCode + "/" + str(radius), HTTPClient.METHOD_PUT)
 	
 func DemoSplatterTest(plusCode8): #Creates random splats all over the given Cell8. Return the image of the given Cell8 after.
 	callEndpoint("/Splatter/Test/" + plusCode8)

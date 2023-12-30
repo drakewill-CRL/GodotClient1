@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://pcj5vqd7p4l4"]
+[gd_scene load_steps=4 format=3 uid="uid://pcj5vqd7p4l4"]
 
 [ext_resource type="Script" path="res://PraxisMapper/Controls/MapTile.gd" id="1_57dev"]
 [ext_resource type="PackedScene" uid="uid://8os6eof5qcbh" path="res://PraxisMapper/APICalls/PraxisEndpoints.tscn" id="2_j7ipw"]
+[ext_resource type="PackedScene" uid="uid://ddl6jqncfeef4" path="res://PraxisMapper/APICalls/PraxisAPICall.tscn" id="3_1pf3y"]
 
 [node name="MapTile" type="Node2D"]
 script = ExtResource("1_57dev")
@@ -14,5 +15,7 @@ offset_bottom = 400.0
 wait_time = 60.0
 
 [node name="PraxisEndpoints" parent="." instance=ExtResource("2_j7ipw")]
+
+[node name="PraxisAPICall" parent="." instance=ExtResource("3_1pf3y")]
 
 [connection signal="timeout" from="Timer" to="." method="GetTileGeneration"]

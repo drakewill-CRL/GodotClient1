@@ -28,7 +28,7 @@ func _on_btn_login_pressed():
 	print("login pressed")
 	lblError.text = "Logging in...."
 	
-	PraxisMapper.serverURL = txtServer.text
+	PraxisMapper.serverURL = "http://192.168.50.74:5000" #txtServer.text
 	api2.response_data.connect(login_completed)
 	api2.Login('', txtUsername.text, txtPassword.text)
 
@@ -49,10 +49,11 @@ func login_completed(result):
 	
 	PraxisMapper.username = txtUsername.text
 	PraxisMapper.password = txtPassword.text
-	PraxisMapper.serverURL = txtServer.text
+	PraxisMapper.serverURL = "http://192.168.50.74:5000" #txtServer.text
 	PraxisMapper.authKey = data.authToken
 	
-	get_tree().change_scene_to_file("res://Scenes/OverheadView.tscn")
+	#get_tree().change_scene_to_file("res://Scenes/OverheadView.tscn")
+	get_tree().change_scene_to_file("res://Scenes/SplatScene.tscn")
 
 func _on_btn_create_acct_pressed():
 	print("create pressed")

@@ -5,12 +5,20 @@ class_name Card
 
 static var base_deck: Array
 
+static func new_deck():
+	var deck = base_deck.duplicate()
+	deck.shuffle()
+	return deck
+
+
 enum CardSuit {
 	CLUBS,
 	DIAMONDS,
 	HEARTS,
 	SPADES
 }
+
+static var suitText = ["C", "D", "H", "S"]
 
 enum CardValue {
 	ACE = 1,
@@ -27,6 +35,7 @@ enum CardValue {
 	QUEEN,
 	KING
 }
+static var valueText = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
 
 @export var cardSuit: int
 @export var cardValue: int
@@ -42,8 +51,8 @@ static func _static_init():
 func init(card_suit: int, card_value: int, face_up:bool = true):
 	cardSuit = card_suit
 	cardValue = card_value
-	faceUp = face_up
-	
+	faceUp = face_up	
+
 func _ready():
 	#TODO: 
 	pass
@@ -51,7 +60,8 @@ func _ready():
 func flip():
 	faceUp = !faceUp
 	
-static func new_deck():
-	var deck = base_deck.duplicate()
-	deck.shuffle()
-	return deck
+func update_appearance():
+	$Suit.text = suitText[cardSuit]
+	$Value.text = valueText[cardValue]
+	$cardback.visible = !faceUp
+	

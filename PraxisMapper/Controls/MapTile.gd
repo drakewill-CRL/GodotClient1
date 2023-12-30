@@ -11,10 +11,15 @@ var currentTile = ''
 @export var xOffset = 0
 @export var yOffset = 0
 @export var autoRefresh = false
-@export var autoRefreshSeconds = 60
+@export var autoRefreshSeconds = 5
 @export var styleSet = 'mapTiles'
+@export var customPath = ''
 var tileGeneration = 0
 var noiseTex : NoiseTexture2D
+
+
+#OK, for Splatter stuff, I do need to be able to set these to a custom endpoint, because those tiles
+#are drawn by the plugin on a different URL path.
 
 #fires off a signal indicating the user tapped this tile, and what the target PlusCode they tapped is
 signal user_tapped(plusCode) 
@@ -29,16 +34,22 @@ func getTappedCode(x, y):
 func GetTileGeneration():
 	#This will call the tile generation ID api to see if the one on the server is different from the
 	#one on the device and if so, get the server's version.
-	print("getting tile generation")
+	#print("getting tile generation")
 	request.response_data.connect(GenerationListener)
-	var ok = request.GetTileGenerationID(currentTile, styleSet)
+	request.GetTileGenerationID(currentTile, styleSet)
 		
 func GenerationListener(result):
-	print("Generation listener got result")
+	#print("Generation listener got result")
 	request.response_data.disconnect(GenerationListener)
+	#print(result)
+	
+	if (result is String and result == "ERROR"):
+		return
 	
 	var currentGen = int(result.get_string_from_utf8())
-	if (currentGen != tileGeneration):
+	#print(currentGen)
+	if (currentGen != tileGeneration or currentGen == -1):
+		print("loading newer tile because " + str(currentGen))
 		tileGeneration = currentGen
 		LoadTile(currentTile)
 
@@ -49,8 +60,9 @@ func tile_called(result):
 	var image = Image.new()
 	if (image.load_png_from_buffer(result) != OK):
 		return "error2"
-		
+	
 	var saved = image.save_png("user://MapTiles/" + currentTile + "-" + styleSet + ".png")
+	print("saved to "+ currentTile + "-" + styleSet + ".png")
 	if (saved != OK):
 		print("Not saved: " + str(saved))
 	
@@ -60,26 +72,34 @@ func tile_called(result):
 	
 func LoadTile(plusCode):
 	#this loads the image for the plusCode given. GetTile shifts appropriately for offsets automatically.
-	print('loading tile ' + plusCode)
-	texRect.texture = noiseTex
+	#print('loading tile ' + plusCode + " " + styleSet)
+	if !autoRefresh:
+		texRect.texture = noiseTex
 	var img = Image.new().load_from_file("user://MapTiles/" + plusCode + "-" + styleSet + ".png")
-	if (img != null):
-		texRect.texture = ImageTexture.create_from_image(img)
-	else:
+	if (img == null or tileGeneration == -1):
+		#print("Getting new image")
 		request.response_data.connect(tile_called)
 	
-		print("getting " + PraxisMapper.serverURL + "/MapTile/Area/" + plusCode + "/" + styleSet)
-		request.DrawMapTile(plusCode, styleSet)
+		#print("getting " + PraxisMapper.serverURL + "/MapTile/Area/" + plusCode + "/" + styleSet)
+		if customPath == '':
+			request.DrawMapTile(plusCode, styleSet)
+		else:
+			print("get splatter tile")
+			request.callEndpoint(customPath + plusCode)
+		
+	else:
+		#print("using existing image")
+		texRect.texture = ImageTexture.create_from_image(img)
 	
 func GetTile(plusCode):	
-	if PraxisMapper.currentPlusCode.substr(0,8) == PraxisMapper.lastPlusCode.substr(0,8):
+	if autoRefresh == false and PraxisMapper.currentPlusCode.substr(0,8) == PraxisMapper.lastPlusCode.substr(0,8):
 		return
 	
 	currentTile = plusCode.substr(0,8)
 	
 	if (xOffset != 0 or yOffset != 0): #ShiftCode does NOT add the +
 		currentTile = PlusCodes.ShiftCode(currentTile, xOffset, yOffset)
-		
+	
 	LoadTile(currentTile)
 
 func OnPlusCodeChanged(current, previous):
@@ -97,4 +117,5 @@ func _ready():
 	if (autoRefresh == true):
 		timer.one_shot = false
 		timer.autostart = true
+		timer.wait_time = autoRefreshSeconds
 		timer.start()

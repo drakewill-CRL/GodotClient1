@@ -1,6 +1,38 @@
-[gd_scene load_steps=2 format=3 uid="uid://ocl76w841bv1"]
+[gd_scene load_steps=4 format=3 uid="uid://ocl76w841bv1"]
 
 [ext_resource type="Script" path="res://Minigames/Cards/Card.gd" id="1_rm2ey"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_68uee"]
+bg_color = Color(0.956863, 0.992157, 0.956863, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c3ywg"]
+bg_color = Color(0.156863, 0.45098, 0.215686, 1)
+
 [node name="Card" type="Node2D"]
 script = ExtResource("1_rm2ey")
+
+[node name="Panel" type="Panel" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_68uee")
+
+[node name="Suit" type="Label" parent="."]
+offset_left = 23.0
+offset_right = 40.0
+offset_bottom = 31.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 20
+text = "S"
+
+[node name="Value" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 31.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 20
+text = "V
+"
+
+[node name="cardback" type="Panel" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_c3ywg")

@@ -25,6 +25,7 @@ func _init():
 	var err = 0
 	http = HTTPClient.new() # Create the Client. 
 
+	print(PraxisMapper.serverURL)
 	var split = PraxisMapper.serverURL.split(":")
 	if (split.size() == 3): #http:\\url:port
 		err =  http.connect_to_host(split[0] + ":" + split[1], int(split[2])) # Connect to host/port.
@@ -59,6 +60,8 @@ func call_url(endpoint, method = HTTPClient.METHOD_GET, body = ''):
 	
 	if !endpoint.begins_with("/"):
 		endpoint = "/" + endpoint
+		
+	print("calling url " + endpoint)
 
 	var err = http.request(method, endpoint, headers, body) # Request a page from the site (this one was chunked..)
 	if (err != OK):
@@ -319,7 +322,7 @@ func ExpireTiles(place, styleSet): #expires all map tiles in styleSet that conta
 	await call_url(url)
 	
 func GetTileGenerationID(plusCode, styleSet): #Gets the current generation ID (creation count) for a tile. -1 is "expired"
-	var url = "/MapTile/Generatiion/" + plusCode + "/" + styleSet
+	var url = "/MapTile/Generation/" + plusCode + "/" + styleSet
 	await call_url(url)
 
 #Demo endpoint API calls, so this can server immediately as a test client.
