@@ -33,7 +33,7 @@ func saveStyle(data):
 	var json = JSON.new()
 	json.parse(text)
 	var info = json.get_data()
-	$drawer.mapTiles = info	
+	$drawer.mapTiles = info	 #drawer as a verb, not a noun.
 
 func call_done(data):
 	print("Data complete!")
