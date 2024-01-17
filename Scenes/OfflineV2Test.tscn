@@ -12,3 +12,5 @@ script = ExtResource("1_tiw2k")
 [node name="drawer" type="Node2D" parent="."]
 position = Vector2(147, 1478)
 script = ExtResource("3_hwhd8")
+
+[node name="Camera2D" type="Camera2D" parent="."]

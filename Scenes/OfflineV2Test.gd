@@ -17,10 +17,18 @@ func _ready():
 		$drawer.mapTiles = info	
 
 	request.response_data.connect(call_done)
-	request.OfflineV2("86FQQP8H")
+	request.OfflineV2("86HWGG")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	if Input.is_action_pressed("ui_left"):
+		$Camera2D.position.x -= 1
+	if Input.is_action_pressed("ui_right"):
+		$Camera2D.position.x += 1
+	if Input.is_action_pressed("ui_up"):
+		$Camera2D.position.y -= 1
+	if Input.is_action_pressed("ui_down"):
+		$Camera2D.position.y += 1
 	pass
 	
 func saveStyle(data):
@@ -40,6 +48,6 @@ func call_done(data):
 	var json = JSON.new()
 	json.parse(data.get_string_from_utf8())
 	var info = json.get_data()
-	print(info)
+	#print(info)
 	
 	$drawer.DrawOfflineTile(info.entries)
