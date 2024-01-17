@@ -361,3 +361,13 @@ func DemoUnroutineGetAllVisited():
 	var url = "/Unroutine/Visited"
 	var data = await call_url(url)
 	return data.get_string_from_utf8() #all places JSON
+
+func OfflineV2(plusCode):
+	var url = "/Offline/V2/" + plusCode
+	var data = await call_url(url)
+	return data.get_string_from_utf8()
+
+func OfflineStyle(styleSet):
+	var url = "/Offline/Style/" + styleSet
+	var data = await call_url(url)
+	return data.get_string_from_utf8()

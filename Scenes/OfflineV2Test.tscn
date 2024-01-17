@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3 uid="uid://bouomxprl0q2j"]
+
+[ext_resource type="Script" path="res://Scenes/OfflineV2Test.gd" id="1_tiw2k"]
+[ext_resource type="PackedScene" uid="uid://8os6eof5qcbh" path="res://PraxisMapper/APICalls/PraxisEndpoints.tscn" id="2_6qwxl"]
+[ext_resource type="Script" path="res://PraxisMapper/Scripts/DrawOfflineTile.gd" id="3_hwhd8"]
+
+[node name="OfflineV2Test" type="Node2D"]
+script = ExtResource("1_tiw2k")
+
+[node name="PraxisEndpoints" parent="." instance=ExtResource("2_6qwxl")]
+
+[node name="drawer" type="Node2D" parent="."]
+position = Vector2(147, 1478)
+script = ExtResource("3_hwhd8")

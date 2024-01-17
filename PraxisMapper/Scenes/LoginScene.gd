@@ -53,7 +53,8 @@ func login_completed(result):
 	PraxisMapper.authKey = data.authToken
 	
 	#get_tree().change_scene_to_file("res://Scenes/OverheadView.tscn")
-	get_tree().change_scene_to_file("res://Scenes/SplatScene.tscn")
+	#get_tree().change_scene_to_file("res://Scenes/SplatScene.tscn")
+	get_tree().change_scene_to_file("res://Scenes/OfflineV2Test.tscn")
 
 func _on_btn_create_acct_pressed():
 	print("create pressed")

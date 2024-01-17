@@ -222,3 +222,9 @@ func DemoUnroutineGetCurrentTarget():
 	
 func DemoUnroutineGetAllVisited():
 	callEndpoint("/Unroutine/Visited")
+
+func OfflineV2(plusCode):
+	callEndpoint("/Offline/V2/" + plusCode)
+	
+func OfflineStyle(styleSet):
+	callEndpoint("/Offline/Style/" + styleSet)
