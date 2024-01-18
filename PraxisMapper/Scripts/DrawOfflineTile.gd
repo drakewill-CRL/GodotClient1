@@ -8,17 +8,9 @@ var thisscale = 1
 #NOTE: drawOps are drawn in order, so the earlier one has the higher LayerId in PraxisMapper style language.
 #the value/id/order is the MatchOrder for the style in PraxisMapper server
 
-#TODO: styles should probably be a dictionary of style rules.
-#TODO: I may need to add an 'Order' value to drawOps so the client can correctly draw layers.
-static var styles = {
-	"0" = {drawOps = [{color = Color.from_string("f2eef9", Color.MAGENTA), sizePx = 1.0}]}, #bg
-	"10" = {drawOps = [{color = Color.from_string("8f8f8f", Color.MAGENTA), sizePx = 3.0}, {color = "ffffff", sizePx = 1.0}]}, #tertiary
-	"20" = {drawOps = [{color = Color.from_string("ffffe5", Color.MAGENTA), sizePx = 1.0}]}, #university
-	"30" = {drawOps = [{color = Color.from_string("FFD4CE", Color.MAGENTA), sizePx = 1.0}]}, #retail
-	"35" = {drawOps = [{color = Color.from_string("3B3B3B", Color.MAGENTA), sizePx = 1.0}]}, #artsCulture
-};
 
-
+#TODO: set this to use Styles again, and let styles be set from the outside.
+var styles = {}
 static var mapTiles;
 
 

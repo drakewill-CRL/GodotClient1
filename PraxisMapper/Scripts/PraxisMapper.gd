@@ -28,6 +28,18 @@ static var mapTileHeight = 400
 #static var debugStartingPlusCode = "7JWVP5923M" #Shalimar Bagh, Delhi, India
 static var debugStartingPlusCode = "86FRXXXPM8" #Ohio State University, Columbus, OH, USA
 
+#System global values
+#Resolution of PlusCode cells in degrees
+const resolutionCell12Lat = .000025 / 5
+const resolutionCell12Lon = .00003125 / 4; 
+const resolutionCell11Lat = .000025;
+const resolutionCell11Lon = .00003125; 
+const resolutionCell10 = .000125; 
+const resolutionCell8 = .0025; 
+const resolutionCell6 = .05; 
+const resolutionCell4 = 1; 
+const resolutionCell2 = 20;
+
 #storage values for global access at any time.
 static var currentPlusCode = '' #The Cell10 we are currently in.
 static var lastPlusCode = '' #the previous Cell10 we visited.
