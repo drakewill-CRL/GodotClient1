@@ -3,6 +3,7 @@ extends Node2D
 #This is for drawing map tiles directly in the client from Offline/V2 data
 
 var theseentries = null
+var thisscale = 1
 
 #NOTE: drawOps are drawn in order, so the earlier one has the higher LayerId in PraxisMapper style language.
 #the value/id/order is the MatchOrder for the style in PraxisMapper server
@@ -21,8 +22,9 @@ static var styles = {
 static var mapTiles;
 
 
-func DrawOfflineTile(entries):
+func DrawOfflineTile(entries, scale):
 	theseentries = entries
+	thisscale = scale
 	queue_redraw()
 
 
@@ -33,9 +35,9 @@ func _draw():
 	#TODO get scale and image size here.
 	#TODO: determine background color for image and fill that first. Depends on style.
 	#for dev testing, this is the default x1 scale for a Cell8 image
-	var scale = 10.0
-	var width = 80 * 20
-	var height = 100  * 20
+	var scale = thisscale
+	var width = 80 * 20 #= 1600
+	var height = 100  * 20 #= 2000
 	#REMEMBER: PlusCode origin is at the BOTTOM-left, these draw calls use the TOP left.
 	#This should do the same invert drawing that PraxisMapper does server-side.
 	draw_set_transform(Vector2(0,0), 0, Vector2(1,-1))
@@ -69,8 +71,11 @@ func _draw():
 		
 		for s in thisStyle.drawOps:
 			if (entry.gt == 1):
-				#this is just a circle for single points, size is style defined.
-				draw_circle(polyCoords[0], s.sizePx * scale, s.color)
+				#this is just a circle for single points, size is roughly a Cell10
+				#4.5 looks good for POIs, but bad for Trees, which there are quite a few of.
+				#trees are size 0.2, so I should probably make other elements larger?
+				#MOST of them shouldn't be points, but lines shouldn't be a Cell10 wide either.
+				draw_circle(polyCoords[0], s.sizePx * 2.0 * scale, s.color)
 			elif (entry.gt == 2):
 				#This is significantly faster than calling draw_line for each of these.
 				draw_polyline(polyCoords, s.color, s.sizePx * scale)
@@ -78,18 +83,33 @@ func _draw():
 				#A single color, which is what I generally use. TODO: decide how the texture2d part should work.
 				draw_colored_polygon(polyCoords, s.color) 
 	print("Drawing done")
-	RenderToFiles("86HWGG", scale)
+	#RenderToFiles("86HWGG", scale)
 
 func RenderToFiles(plusCode, scale):
 	#TODO: add a new Viewport node with a Camera2D to pan around and save stuff.
-	var sv = SubViewport.new()
-	sv.render_target_update_mode = SubViewport.UPDATE_ALWAYS #TODO may not be the right property, or necessary?
-	add_child(sv)
-	var camera = Camera2D.new()
-	sv.add_child(camera)
+	
+	#var vt = ViewportTexture.new()
+	#vt.size = Vector2i(80 * scale, 100 * scale) #This subviewport draws the Cell8 image.
+	#add_child(vt)
+	#var svc = SubViewportContainer.new()
+	#svc.size = Vector2i(80 * scale, 100 * scale) #This subviewport draws the Cell8 image.
+	#add_child(svc)
+	var viewport = $svc/SubViewport
+	viewport.size = Vector2i(80 * scale, 100 * scale) #This subviewport draws the Cell8 image.
+	viewport.size_2d_override = Vector2i(80 * scale, 100 * scale) #This subviewport draws the Cell8 image.
+	#var sv = SubViewport.new()
+	#sv.render_target_update_mode = SubViewport.UPDATE_ALWAYS #TODO may not be the right property, or necessary?
+	#add_child(sv)
+	#svc.add_child(sv)
+	var camera = $svc/SubViewport/Camera2D
+	
+	viewport.add_child(camera)
+	viewport.size = Vector2i(80 * scale, 100 * scale) #This subviewport draws the Cell8 image.
+	camera.make_current()
+	
 	#TODO: sort out correct properties for these nodes.
 	#TODO: confirm I dont need the sv to be attached to a container or texture.
-	sv.size = Vector2i(80 * scale, 100 * scale) #This subviewport draws the Cell8 image.
+	#sv.size = Vector2i(80 * scale, 100 * scale) #This subviewport draws the Cell8 image.
 	#TODO: see if this will save the whole image if I set the size to 3200x4000
 	
 	camera.position.y = 4000
@@ -99,9 +119,9 @@ func RenderToFiles(plusCode, scale):
 		#yPos -= (PlusCodes.CODE_ALPHABET_.find(yChar) * 20 * scale)
 		camera.position.y -= (100 * scale)
 		for xChar in PlusCodes.CODE_ALPHABET_:
-			await RenderingServer.frame_post_draw
+			#await RenderingServer.frame_post_draw
 			camera.position.x = PlusCodes.CODE_ALPHABET_.find(xChar) * 20 * scale
 			#TODO: Save image to file.
-			var img = $Viewport.get_texture().get_image() # Get rendered image
-			img.save_png(plusCode + yChar + xChar + ".png") # Save to disk
+			var img = viewport.get_texture().get_image() # Get rendered image
+			img.save_png("user://" + plusCode + yChar + xChar + ".png") # Save to disk
 			print("saved image " + plusCode + yChar + xChar)

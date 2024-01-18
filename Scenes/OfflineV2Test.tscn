@@ -9,8 +9,21 @@ script = ExtResource("1_tiw2k")
 
 [node name="PraxisEndpoints" parent="." instance=ExtResource("2_6qwxl")]
 
-[node name="drawer" type="Node2D" parent="."]
-position = Vector2(147, 1478)
+[node name="svc" type="SubViewportContainer" parent="."]
+offset_left = -4000.0
+offset_right = -3200.0
+offset_bottom = 1000.0
+
+[node name="SubViewport" type="SubViewport" parent="svc"]
+transparent_bg = true
+size = Vector2i(800, 1000)
+render_target_update_mode = 4
+
+[node name="drawer" type="Node2D" parent="svc/SubViewport"]
 script = ExtResource("3_hwhd8")
 
+[node name="subcam" type="Camera2D" parent="svc/SubViewport"]
+anchor_mode = 0
+
 [node name="Camera2D" type="Camera2D" parent="."]
+anchor_mode = 0
