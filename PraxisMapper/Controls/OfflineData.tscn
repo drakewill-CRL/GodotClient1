@@ -22,3 +22,4 @@ render_target_update_mode = 4
 script = ExtResource("3_pvy2d")
 
 [node name="subcam" type="Camera2D" parent="svc/SubViewport"]
+anchor_mode = 0

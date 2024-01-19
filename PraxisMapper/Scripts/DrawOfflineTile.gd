@@ -9,9 +9,8 @@ var thisscale = 1
 #the value/id/order is the MatchOrder for the style in PraxisMapper server
 
 
-#TODO: set this to use Styles again, and let styles be set from the outside.
-var styles = {}
-static var mapTiles;
+#This is set from outside.
+var style
 
 
 func DrawOfflineTile(entries, scale):
@@ -41,14 +40,14 @@ func _draw():
 	bgCoords.append(Vector2(width * scale,height * scale))
 	bgCoords.append(Vector2(0,height * scale))
 	bgCoords.append(Vector2(0,0))
-	draw_colored_polygon(bgCoords, mapTiles["9999"].drawOps[0].color) 
+	draw_colored_polygon(bgCoords, style["9999"].drawOps[0].color) 
 	
 	#entries has a big list of coord sets as strings
 	for entry in theseentries:
 		#TODO get style rule color and size for drawing here
 		#TODO: loop here for each style draw rule entry.
 		
-		var thisStyle = mapTiles[str(entry.tid)]
+		var thisStyle = style[str(entry.tid)]
 		var styleColor = Color.MEDIUM_SPRING_GREEN
 		var lineSize = 1.0 * scale
 		

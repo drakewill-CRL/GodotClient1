@@ -94,6 +94,8 @@ func perm_check(granted):
 
 func _ready():
 	DirAccess.make_dir_absolute("user://MapTiles")
+	DirAccess.make_dir_absolute("user://Styles")
+	DirAccess.make_dir_absolute("user://Offline")
 	gps_provider = Engine.get_singleton("GodotAndroidGpsProvider")
 	if gps_provider != null:
 		#TODO: GPS location currently works. GPS Permisisons currently do NOT. Needs manually enabled.
@@ -119,3 +121,12 @@ func _ready():
 		debugControls.position.x = 0
 		debugControls.position.y = 0
 		debugControls.z_index = 200
+		
+#TODO: add function here to download and create tiles for simplicity.
+func MakeOfflineTiles(plusCode, scale):
+	var offlineNode = preload("res://PraxisMapper/Controls/OfflineData.tscn")
+	var offlineInst = offlineNode.instantiate()
+	add_child(offlineInst)
+	offlineInst.GetAndProcessData(plusCode, scale, "mapTiles")
+	await offlineInst.tiles_saved
+	remove_child(offlineInst)

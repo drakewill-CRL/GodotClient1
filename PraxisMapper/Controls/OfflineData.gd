@@ -19,6 +19,7 @@ func GetAndProcessData(pluscode6, scaleSize, styleSet):
 	style = styleSet
 	GetStyle()
 	GetData()
+	SaveTiles()
 	
 func GetStyle():
 	var styleData = FileAccess.open("user://Styles/" + style + ".json", FileAccess.READ)
@@ -37,7 +38,10 @@ func GetStyle():
 func SaveStyle(data):
 	request.response_data.disconnect(SaveStyle)
 	var text = data.get_string_from_utf8()
-	var styleData = FileAccess.open("user://Styles/mapTiles.json", FileAccess.WRITE)
+	var styleData = FileAccess.open("user://Styles/" + style + ".json", FileAccess.WRITE)
+	if (styleData == null):
+		print(FileAccess.get_open_error())
+	
 	styleData.store_string(text)
 	styleData.close()
 	
