@@ -94,6 +94,7 @@ func perm_check(granted):
 
 func _ready():
 	DirAccess.make_dir_absolute("user://MapTiles")
+	DirAccess.make_dir_absolute("user://NameTiles")
 	DirAccess.make_dir_absolute("user://Styles")
 	DirAccess.make_dir_absolute("user://Offline")
 	gps_provider = Engine.get_singleton("GodotAndroidGpsProvider")
@@ -122,11 +123,29 @@ func _ready():
 		debugControls.position.y = 0
 		debugControls.z_index = 200
 		
-#TODO: add function here to download and create tiles for simplicity.
 func MakeOfflineTiles(plusCode, scale):
 	var offlineNode = preload("res://PraxisMapper/Controls/OfflineData.tscn")
 	var offlineInst = offlineNode.instantiate()
 	add_child(offlineInst)
-	offlineInst.GetAndProcessData(plusCode, scale, "mapTiles")
+	await offlineInst.GetAndProcessData(plusCode, scale, "mapTiles")
 	await offlineInst.tiles_saved
 	remove_child(offlineInst)
+
+static func GetNameFromNameTile(plusCode8Tile, pixelX, pixelY):
+	var locationData = FileAccess.open("user://Offline/" + plusCode8Tile.substr(0,6) + ".json", FileAccess.READ)
+	var json = JSON.new()
+	var textData = locationData.get_as_text()
+	json.parse(textData)
+	var mapData = json.data
+		
+	var nameTile = Image.load_from_file("user://NameTiles/" + plusCode8Tile + "-4.png")
+	var pixel = nameTile.get_pixel(pixelX, pixelY)
+	if (pixel == Color.BLACK):
+		return ""
+	
+	var nameTableId = pixel.r8 + pixel.g8 * 255 + pixel.b8 * 65535
+	if (nameTableId == 0):
+		return ""
+
+	var name = mapData.nameTable[str(nameTableId)]
+	return name

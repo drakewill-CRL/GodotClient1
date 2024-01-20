@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://b78murfwi2mky"]
+[gd_scene load_steps=5 format=3 uid="uid://b78murfwi2mky"]
 
 [ext_resource type="Script" path="res://PraxisMapper/Controls/OfflineData.gd" id="1_li1gb"]
 [ext_resource type="PackedScene" uid="uid://8os6eof5qcbh" path="res://PraxisMapper/APICalls/PraxisEndpoints.tscn" id="2_oqqjq"]
 [ext_resource type="Script" path="res://PraxisMapper/Scripts/DrawOfflineTile.gd" id="3_pvy2d"]
+[ext_resource type="Script" path="res://PraxisMapper/Scripts/DrawOfflineNameTile.gd" id="4_irqda"]
 
 [node name="OfflineData" type="Node2D"]
 script = ExtResource("1_li1gb")
@@ -20,6 +21,9 @@ render_target_update_mode = 4
 
 [node name="fullMap" type="Node2D" parent="svc/SubViewport"]
 script = ExtResource("3_pvy2d")
+
+[node name="nameMap" type="Node2D" parent="svc/SubViewport"]
+script = ExtResource("4_irqda")
 
 [node name="subcam" type="Camera2D" parent="svc/SubViewport"]
 anchor_mode = 0

@@ -18,7 +18,6 @@ func DrawOfflineTile(entries, scale):
 	thisscale = scale
 	queue_redraw()
 
-
 func _draw():
 	if theseentries == null:
 		return
@@ -48,7 +47,6 @@ func _draw():
 		#TODO: loop here for each style draw rule entry.
 		
 		var thisStyle = style[str(entry.tid)]
-		var styleColor = Color.MEDIUM_SPRING_GREEN
 		var lineSize = 1.0 * scale
 		
 		#entry.p is a string of coords separated by a pipe
@@ -74,45 +72,3 @@ func _draw():
 				#A single color, which is what I generally use. TODO: decide how the texture2d part should work.
 				draw_colored_polygon(polyCoords, s.color) 
 	print("Drawing done")
-	#RenderToFiles("86HWGG", scale)
-
-func RenderToFiles(plusCode, scale):
-	#TODO: add a new Viewport node with a Camera2D to pan around and save stuff.
-	
-	#var vt = ViewportTexture.new()
-	#vt.size = Vector2i(80 * scale, 100 * scale) #This subviewport draws the Cell8 image.
-	#add_child(vt)
-	#var svc = SubViewportContainer.new()
-	#svc.size = Vector2i(80 * scale, 100 * scale) #This subviewport draws the Cell8 image.
-	#add_child(svc)
-	var viewport = $svc/SubViewport
-	viewport.size = Vector2i(80 * scale, 100 * scale) #This subviewport draws the Cell8 image.
-	viewport.size_2d_override = Vector2i(80 * scale, 100 * scale) #This subviewport draws the Cell8 image.
-	#var sv = SubViewport.new()
-	#sv.render_target_update_mode = SubViewport.UPDATE_ALWAYS #TODO may not be the right property, or necessary?
-	#add_child(sv)
-	#svc.add_child(sv)
-	var camera = $svc/SubViewport/Camera2D
-	
-	viewport.add_child(camera)
-	viewport.size = Vector2i(80 * scale, 100 * scale) #This subviewport draws the Cell8 image.
-	camera.make_current()
-	
-	#TODO: sort out correct properties for these nodes.
-	#TODO: confirm I dont need the sv to be attached to a container or texture.
-	#sv.size = Vector2i(80 * scale, 100 * scale) #This subviewport draws the Cell8 image.
-	#TODO: see if this will save the whole image if I set the size to 3200x4000
-	
-	camera.position.y = 4000
-	#TODO: foreach cell8 in the area given, move the camera.  This assumed this plusCode is a Cell6 area.
-	for yChar in PlusCodes.CODE_ALPHABET_:
-		#This kept complaining about can't - a Vector2 and an Int so I had to do this.
-		#yPos -= (PlusCodes.CODE_ALPHABET_.find(yChar) * 20 * scale)
-		camera.position.y -= (100 * scale)
-		for xChar in PlusCodes.CODE_ALPHABET_:
-			#await RenderingServer.frame_post_draw
-			camera.position.x = PlusCodes.CODE_ALPHABET_.find(xChar) * 20 * scale
-			#TODO: Save image to file.
-			var img = viewport.get_texture().get_image() # Get rendered image
-			img.save_png("user://" + plusCode + yChar + xChar + ".png") # Save to disk
-			print("saved image " + plusCode + yChar + xChar)
