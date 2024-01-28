@@ -1,6 +1,7 @@
 extends Node2D
 
 #This is for drawing map tiles directly in the client from Offline/V2 data
+#This file handles terrain IDs, so that terrain types and unnamed places can be identified by the game.
 
 var theseentries = null
 var thisscale = 1
@@ -39,15 +40,19 @@ func _draw():
 	bgCoords.append(Vector2(width * scale,height * scale))
 	bgCoords.append(Vector2(0,height * scale))
 	bgCoords.append(Vector2(0,0))
-	draw_colored_polygon(bgCoords, style["9999"].drawOps[0].color) 
+	draw_colored_polygon(bgCoords, Color.BLACK) 
 	
 	#entries has a big list of coord sets as strings
 	for entry in theseentries:
 		#TODO get style rule color and size for drawing here
 		#TODO: loop here for each style draw rule entry.
 		
-		var thisStyle = style[str(entry.tid)]
+		var r = (int(entry.tid) % 256) / 256.0
+		var g = (int(entry.tid / 256) % 256) / 256.0
+		var b = (int(entry.tid / 65536) % 256) / 256.0
+		var terrainColor = Color(r, g, b)
 		var lineSize = 1.0 * scale
+		var thisStyle = style[str(entry.tid)]
 		
 		#entry.p is a string of coords separated by a pipe
 		#EX: 0,0|20,0|20,20|20,0|0,0 is a basic square.
@@ -64,11 +69,11 @@ func _draw():
 				#4.5 looks good for POIs, but bad for Trees, which there are quite a few of.
 				#trees are size 0.2, so I should probably make other elements larger?
 				#MOST of them shouldn't be points, but lines shouldn't be a Cell10 wide either.
-				draw_circle(polyCoords[0], s.sizePx * 2.0 * scale * 5, s.color)
+				draw_circle(polyCoords[0], s.sizePx * 2.0 * scale * 5, terrainColor)
 			elif (entry.gt == 2):
 				#This is significantly faster than calling draw_line for each of these.
-				draw_polyline(polyCoords, s.color, s.sizePx * scale * 5, true)
+				draw_polyline(polyCoords, terrainColor, s.sizePx * scale * 5, true)
 			elif entry.gt == 3:
 				#A single color, which is what I generally use. TODO: decide how the texture2d part should work.
-				draw_colored_polygon(polyCoords, s.color) 
+				draw_colored_polygon(polyCoords, terrainColor) 
 	print("Drawing done")

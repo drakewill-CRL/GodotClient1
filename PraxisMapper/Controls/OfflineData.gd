@@ -99,15 +99,15 @@ func CreateTiles():
 	var scale = scaleVal
 	
 	camera.position = Vector2(0,0)
-	viewport.size = Vector2i(80 * scale, 100 * scale) #This subviewport draws the Cell8 image.
+	viewport.size = Vector2i(320 * scale, 500 * scale) #This subviewport draws the Cell8 image.
 	await RenderingServer.frame_post_draw
 		
 	for yChar in PlusCodes.CODE_ALPHABET_:
 		#This kept complaining about can't - a Vector2 and an Int so I had to do this.
 		#yPos -= (PlusCodes.CODE_ALPHABET_.find(yChar) * 20 * scale)
-		camera.position.y -= (100 * scale)
+		camera.position.y -= (500 * scale)
 		for xChar in PlusCodes.CODE_ALPHABET_:
-			camera.position.x = (PlusCodes.CODE_ALPHABET_.find(xChar) * 80 * scale)
+			camera.position.x = (PlusCodes.CODE_ALPHABET_.find(xChar) * 320 * scale)
 			await RenderingServer.frame_post_draw
 			var img = viewport.get_texture().get_image() # Get rendered image
 			img.save_png("user://MapTiles/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk

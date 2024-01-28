@@ -28,8 +28,8 @@ func _draw():
 	#TODO: determine background color for image and fill that first. Depends on style.
 	#for dev testing, this is the default x1 scale for a Cell8 image
 	var scale = thisscale
-	var width = 80 * 20 #= 1600
-	var height = 100  * 20 #= 2000
+	var width = 80 * 20 * 16 #= 1600
+	var height = 100  * 20 * 20 #= 2000
 	#REMEMBER: PlusCode origin is at the BOTTOM-left, these draw calls use the TOP left.
 	#This should do the same invert drawing that PraxisMapper does server-side.
 	draw_set_transform(Vector2(0,0), 0, Vector2(1,-1))
@@ -48,7 +48,7 @@ func _draw():
 		#TODO get style rule color and size for drawing here
 		#TODO: loop here for each style draw rule entry.
 		
-		if (entry.nid != null and entry.nid > 0):
+		if (entry.has("nid")):
 			var thisStyle = style[str(entry.tid)]
 			#THESE are the integer values, but Godot only makes colors with 0-1 range when passing them in.
 			var r = (int(entry.nid) % 256) / 256.0
@@ -72,10 +72,10 @@ func _draw():
 					#4.5 looks good for POIs, but bad for Trees, which there are quite a few of.
 					#trees are size 0.2, so I should probably make other elements larger?
 					#MOST of them shouldn't be points, but lines shouldn't be a Cell10 wide either.
-					draw_circle(polyCoords[0], s.sizePx * 2.0 * scale, nameColor)
+					draw_circle(polyCoords[0], s.sizePx * 2.0 * scale * 5, nameColor)
 				elif (entry.gt == 2):
 					#This is significantly faster than calling draw_line for each of these.
-					draw_polyline(polyCoords, nameColor, s.sizePx * scale)
+					draw_polyline(polyCoords, nameColor, s.sizePx * scale * 20)
 				elif entry.gt == 3:
 					#A single color, which is what I generally use. TODO: decide how the texture2d part should work.
 					draw_colored_polygon(polyCoords, nameColor) 
