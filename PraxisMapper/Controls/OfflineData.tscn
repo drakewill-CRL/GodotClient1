@@ -25,5 +25,14 @@ script = ExtResource("3_pvy2d")
 [node name="nameMap" type="Node2D" parent="svc/SubViewport"]
 script = ExtResource("4_irqda")
 
+[node name="boundsMap" type="Node2D" parent="svc/SubViewport"]
+script = ExtResource("3_pvy2d")
+
 [node name="subcam" type="Camera2D" parent="svc/SubViewport"]
+anchor_mode = 0
+
+[node name="subcamName" type="Camera2D" parent="svc/SubViewport"]
+anchor_mode = 0
+
+[node name="subcamBounds" type="Camera2D" parent="svc/SubViewport"]
 anchor_mode = 0

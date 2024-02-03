@@ -27,8 +27,8 @@ func _draw():
 	#TODO: determine background color for image and fill that first. Depends on style.
 	#for dev testing, this is the default x1 scale for a Cell8 image
 	var scale = thisscale
-	var width = 80 * 20 * 16 #= 1600
-	var height = 100  * 20 * 20 #= 2000
+	var width = 80 * 20 * 16 #= 25600
+	var height = 100  * 20 * 20 #= 40000
 	#REMEMBER: PlusCode origin is at the BOTTOM-left, these draw calls use the TOP left.
 	#This should do the same invert drawing that PraxisMapper does server-side.
 	draw_set_transform(Vector2(0,0), 0, Vector2(1,-1))

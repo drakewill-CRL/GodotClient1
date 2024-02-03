@@ -7,7 +7,7 @@ signal style_ready()
 signal data_saved()
 signal data_ready()
 signal tiles_saved()
-signal nametiles_saved()
+#signal nametiles_saved()
 
 var plusCode = ""
 var style = "mapTiles"
@@ -15,14 +15,17 @@ var scaleVal = 1
 var mapData
 
 func GetAndProcessData(pluscode6, scaleSize, styleSet):
+	print("Triple-processing data")
 	plusCode = pluscode6
 	scaleVal = scaleSize
 	style = styleSet
 	await GetStyle()
 	#await GetData()
 	await GetDataFromZip("OhioOffline.zip", pluscode6)
-	await SaveTiles()
-	await SaveNameTiles()
+	#await SaveTiles()
+	#await SaveNameTiles()
+	print("being tile making")
+	await CreateAllTiles()
 	
 func GetStyle():
 	var styleData = FileAccess.open("user://Styles/" + style + ".json", FileAccess.READ)
@@ -35,8 +38,9 @@ func GetStyle():
 		json.parse(styleData.get_as_text())
 		var info = json.get_data()
 		$svc/SubViewport/fullMap.style = info
-		$svc/SubViewport/nameMap.style = info
+		$svc2/SubViewport/nameMap.style = info
 		styleData.close()
+		
 	style_ready.emit()
 
 func SaveStyle(data):
@@ -99,24 +103,78 @@ func GetDataFromZip(file, plusCode):
 func SaveTiles():
 	$svc/SubViewport/fullMap.visible = true
 	$svc/SubViewport/nameMap.visible = false
+	$svc/SubViewport/boundsMap.visible = false
 	$svc/SubViewport/fullMap.DrawOfflineTile(mapData.entries["mapTiles"], scaleVal)
-	await CreateTiles()
+	await CreateTiles("MapTiles")
 	
 func SaveNameTiles():
 	$svc/SubViewport/fullMap.visible = false
 	$svc/SubViewport/fullMap.position.y = -100000
+	$svc/SubViewport/boundsMap.visible = false
+	$svc/SubViewport/boundsMap.position.y = -100000
 	$svc/SubViewport/nameMap.visible = true
 	$svc/SubViewport/nameMap.DrawOfflineNameTile(mapData.entries["mapTiles"], scaleVal)
-	await CreateNameTiles()
+	await CreateTiles("NameTiles")
 	
 func SaveAdminNameTiles():
 	$svc/SubViewport/fullMap.visible = false
 	$svc/SubViewport/fullMap.position.y = -100000
-	$svc/SubViewport/nameMap.visible = true
-	$svc/SubViewport/nameMap.DrawOfflineNameTile(mapData.entries["adminBounds"], scaleVal)
-	await CreateNameTiles()
+	$svc/SubViewport/nameMap.visible = false
+	$svc/SubViewport/nameMap.position.y = -100000
+	$svc/SubViewport/boundsMap.visible = true
+	$svc/SubViewport/boundsMap.position.y = 0
+	$svc/SubViewport/nameMap.DrawOfflineNameTile(mapData.entries["adminBoundsFilled"], scaleVal)
+	await CreateTiles("BoundsTiles")
+	
+func CreateAllTiles():
+	#Gonna try and see if we can write 3 tiles at once.
+	#Fullmap at 0, name map at 40k, bounds map at 80k
+	$svc/SubViewport/fullMap.position.y = 0
+	$svc2/SubViewport/nameMap.position.y = 40000
+	$svc3/SubViewport/boundsMap.position.y = 80000
+	
+	$svc/SubViewport/fullMap.DrawOfflineTile(mapData.entries["mapTiles"], scaleVal)
+	$svc2/SubViewport/nameMap.DrawOfflineNameTile(mapData.entries["mapTiles"], scaleVal)
+	$svc3/SubViewport/boundsMap.DrawOfflineBoundsTile(mapData.entries["adminBoundsFilled"], scaleVal)
+	
+	var viewport1 = $svc/SubViewport
+	var viewport2 = $svc2/SubViewport
+	var viewport3 = $svc3/SubViewport
+	var camera1 = $svc/SubViewport/subcam
+	var camera2 = $svc2/SubViewport/subcam
+	var camera3 = $svc3/SubViewport/subcam
+	var scale = scaleVal
+	
+	camera1.position = Vector2(0,0)
+	camera2.position = Vector2(0,40000)
+	camera3.position = Vector2(0,80000)
+	viewport1.size = Vector2i(320 * scale, 500 * scale)
+	viewport2.size = Vector2i(320 * scale, 500 * scale)
+	viewport3.size = Vector2i(320 * scale, 500 * scale)
+	await RenderingServer.frame_post_draw
+		
+	for yChar in PlusCodes.CODE_ALPHABET_:
+		#This kept complaining about can't - a Vector2 and an Int so I had to do this.
+		#yPos -= (PlusCodes.CODE_ALPHABET_.find(yChar) * 20 * scale)
+		camera1.position.y -= (500 * scale)
+		camera2.position.y -= (500 * scale)
+		camera3.position.y -= (500 * scale)
+		for xChar in PlusCodes.CODE_ALPHABET_:
+			camera1.position.x = (PlusCodes.CODE_ALPHABET_.find(xChar) * 320 * scale)
+			camera2.position.x = (PlusCodes.CODE_ALPHABET_.find(xChar) * 320 * scale)
+			camera3.position.x = (PlusCodes.CODE_ALPHABET_.find(xChar) * 320 * scale)
+			await RenderingServer.frame_post_draw
+			var img1 = viewport1.get_texture().get_image() # Get rendered image
+			img1.save_png("user://MapTiles/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk
+			var img2 = viewport2.get_texture().get_image() # Get rendered image
+			img2.save_png("user://NameTiles/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk
+			var img3 = viewport3.get_texture().get_image() # Get rendered image
+			img3.save_png("user://BoundsTiles/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk
+			print("Saved tiles for " + plusCode + yChar + xChar)
+	
+	tiles_saved.emit()
 
-func CreateTiles():
+func CreateTiles(folderName):
 	var viewport = $svc/SubViewport
 	var camera = $svc/SubViewport/subcam
 	var scale = scaleVal
@@ -133,29 +191,7 @@ func CreateTiles():
 			camera.position.x = (PlusCodes.CODE_ALPHABET_.find(xChar) * 320 * scale)
 			await RenderingServer.frame_post_draw
 			var img = viewport.get_texture().get_image() # Get rendered image
-			img.save_png("user://MapTiles/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk
+			img.save_png("user://" + folderName + "/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk
 			print("Saved tile " + plusCode + yChar + xChar)
 	
 	tiles_saved.emit()
-	
-func CreateNameTiles():
-	var viewport = $svc/SubViewport
-	var camera = $svc/SubViewport/subcam
-	var scale = scaleVal
-
-	camera.position = Vector2(0,0)
-	viewport.size = Vector2i(320 * scale, 500 * scale) #This subviewport draws the Cell8 image.
-	await RenderingServer.frame_post_draw
-		
-	for yChar in PlusCodes.CODE_ALPHABET_:
-		#This kept complaining about can't - a Vector2 and an Int so I had to do this.
-		#yPos -= (PlusCodes.CODE_ALPHABET_.find(yChar) * 20 * scale)
-		camera.position.y -= (500 * scale)
-		for xChar in PlusCodes.CODE_ALPHABET_:
-			camera.position.x = (PlusCodes.CODE_ALPHABET_.find(xChar) * 320 * scale)
-			await RenderingServer.frame_post_draw
-			var img = viewport.get_texture().get_image() # Get rendered image
-			img.save_png("user://NameTiles/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk
-			print("Saved nametile " + plusCode + yChar + xChar)
-	
-	nametiles_saved.emit()

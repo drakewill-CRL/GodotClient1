@@ -95,6 +95,7 @@ func perm_check(granted):
 func _ready():
 	DirAccess.make_dir_absolute("user://MapTiles")
 	DirAccess.make_dir_absolute("user://NameTiles")
+	DirAccess.make_dir_absolute("user://BoundsTiles")
 	DirAccess.make_dir_absolute("user://Styles")
 	DirAccess.make_dir_absolute("user://Offline")
 	gps_provider = Engine.get_singleton("GodotAndroidGpsProvider")
@@ -124,7 +125,9 @@ func _ready():
 		debugControls.z_index = 200
 		
 func MakeOfflineTiles(plusCode, scale):
-	var offlineNode = preload("res://PraxisMapper/Controls/OfflineData.tscn")
+	#var offlineNode = preload("res://PraxisMapper/Controls/OfflineData.tscn")
+	#TODO: rename this later once it's done as cleanup
+	var offlineNode = preload("res://PraxisMapper/Controls/OfflineDataTriple.tscn")
 	var offlineInst = offlineNode.instantiate()
 	add_child(offlineInst)
 	await offlineInst.GetAndProcessData(plusCode, scale, "mapTiles")

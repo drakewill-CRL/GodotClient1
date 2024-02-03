@@ -1,12 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://bouomxprl0q2j"]
+[gd_scene load_steps=2 format=3 uid="uid://bouomxprl0q2j"]
 
 [ext_resource type="Script" path="res://Scenes/OfflineV2Test.gd" id="1_tiw2k"]
-[ext_resource type="PackedScene" uid="uid://b78murfwi2mky" path="res://PraxisMapper/Controls/OfflineData.tscn" id="4_wwpkr"]
 
 [node name="OfflineV2Test" type="Node2D"]
 script = ExtResource("1_tiw2k")
-
-[node name="OfflineData" parent="." instance=ExtResource("4_wwpkr")]
-process_thread_group = 1
-process_thread_group_order = 0
-process_thread_messages = 0

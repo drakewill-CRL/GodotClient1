@@ -11,10 +11,10 @@ var thisscale = 1
 
 
 #This is set from outside.
-var style
+var style #admin bounds style, not maptiles.
 
 
-func DrawOfflineNameTile(entries, scale):
+func DrawOfflineBoundsTile(entries, scale):
 	theseentries = entries
 	thisscale = scale
 	queue_redraw()
@@ -49,7 +49,7 @@ func _draw():
 		#TODO: loop here for each style draw rule entry.
 		
 		if (entry.has("nid")):
-			var thisStyle = style[str(entry.tid)]
+			#var thisStyle = style[str(entry.tid)]
 			#THESE are the integer values, but Godot only makes colors with 0-1 range when passing them in.
 			var r = (int(entry.nid) % 256) / 256.0
 			var g = (int(entry.nid / 256) % 256) / 256.0
@@ -65,18 +65,19 @@ func _draw():
 				var point = coords[i].split(",")
 				var workVector = Vector2(int(point[0]) * scale, int(point[1]) * scale)
 				polyCoords.append(workVector)
-		
-			for s in thisStyle.drawOps:
-				if (entry.gt == 1):
-					#this is just a circle for single points, size is roughly a Cell10
-					#4.5 looks good for POIs, but bad for Trees, which there are quite a few of.
-					#trees are size 0.2, so I should probably make other elements larger?
-					#MOST of them shouldn't be points, but lines shouldn't be a Cell10 wide either.
-					draw_circle(polyCoords[0], s.sizePx * 2.0 * scale * 5, nameColor)
-				elif (entry.gt == 2):
-					#This is significantly faster than calling draw_line for each of these.
-					draw_polyline(polyCoords, nameColor, s.sizePx * scale * 5) #no antialiasing, colors matter.
-				elif entry.gt == 3:
-					#A single color, which is what I generally use. TODO: decide how the texture2d part should work.
-					draw_colored_polygon(polyCoords, nameColor) 
+
+			#These are admin bounds, 99% of these should be polygons.
+			#for s in thisStyle.drawOps:
+			if (entry.gt == 1):
+				#this is just a circle for single points, size is roughly a Cell10
+				#4.5 looks good for POIs, but bad for Trees, which there are quite a few of.
+				#trees are size 0.2, so I should probably make other elements larger?
+				#MOST of them shouldn't be points, but lines shouldn't be a Cell10 wide either.
+				draw_circle(polyCoords[0], 20 * 2.0 * scale * 5, nameColor)
+			elif (entry.gt == 2):
+				#This is significantly faster than calling draw_line for each of these.
+				draw_polyline(polyCoords, nameColor, 5 * scale * 5) #no antialiasing, colors matter.
+			elif entry.gt == 3:
+				#A single color, which is all I need for names
+				draw_colored_polygon(polyCoords, nameColor) 
 

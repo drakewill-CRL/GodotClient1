@@ -10,7 +10,7 @@ var thisscale = 1
 
 
 #This is set from outside.
-var style
+var style #same logic as for NameTiles
 
 
 func DrawOfflineTile(entries, scale):
@@ -22,12 +22,11 @@ func _draw():
 	if theseentries == null:
 		return
 	
-	#TODO get scale and image size here.
 	#TODO: determine background color for image and fill that first. Depends on style.
 	#for dev testing, this is the default x1 scale for a Cell8 image
 	var scale = thisscale
-	var width = 80 * 20 * 16 #= 1600
-	var height = 100  * 20 * 20 #= 2000
+	var width = 80 * 20 * 16 #= 25600
+	var height = 100  * 20 * 20 #= 40000
 	#REMEMBER: PlusCode origin is at the BOTTOM-left, these draw calls use the TOP left.
 	#This should do the same invert drawing that PraxisMapper does server-side.
 	draw_set_transform(Vector2(0,0), 0, Vector2(1,-1))
@@ -67,7 +66,7 @@ func _draw():
 				draw_circle(polyCoords[0], s.sizePx * 2.0 * scale * 5, s.color)
 			elif (entry.gt == 2):
 				#This is significantly faster than calling draw_line for each of these.
-				draw_polyline(polyCoords, s.color, s.sizePx * scale * 5, true)
+				draw_polyline(polyCoords, s.color, s.sizePx * scale * 5) #dont antialias names, colors matter.
 			elif entry.gt == 3:
 				#A single color, which is what I generally use. TODO: decide how the texture2d part should work.
 				draw_colored_polygon(polyCoords, s.color) 
