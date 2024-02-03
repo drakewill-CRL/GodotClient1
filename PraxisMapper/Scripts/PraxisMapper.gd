@@ -130,7 +130,7 @@ func MakeOfflineTiles(plusCode, scale):
 	await offlineInst.GetAndProcessData(plusCode, scale, "mapTiles")
 	await offlineInst.tiles_saved
 	remove_child(offlineInst)
-
+	
 static func GetNameFromNameTile(plusCode8Tile, pixelX, pixelY):
 	var locationData = FileAccess.open("user://Offline/" + plusCode8Tile.substr(0,6) + ".json", FileAccess.READ)
 	var json = JSON.new()

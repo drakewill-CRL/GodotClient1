@@ -19,7 +19,8 @@ func GetAndProcessData(pluscode6, scaleSize, styleSet):
 	scaleVal = scaleSize
 	style = styleSet
 	await GetStyle()
-	await GetData()
+	#await GetData()
+	await GetDataFromZip("OhioOffline.zip", pluscode6)
 	await SaveTiles()
 	await SaveNameTiles()
 	
@@ -79,18 +80,40 @@ func SaveData(data):
 	savedData.store_string(stringData)
 	savedData.close()
 	data_saved.emit()
+	
+func GetDataFromZip(file, plusCode):
+	var zipReader = ZIPReader.new()
+	var err = zipReader.open("user://" + file) #Assumes this was written to the user partition, not resources.
+	if (err != OK):
+		return
+		
+	var code2 = plusCode.substr(0, 2)
+	var code4 = plusCode.substr(2, 2)
+	var rawdata := zipReader.read_file(code2 + "/" + code4 + "/" + plusCode + ".json")
+	var realData = rawdata.get_string_from_utf8()
+	var json = JSON.new()
+	json.parse(realData)
+	mapData = json.data
+	data_ready.emit()
 
 func SaveTiles():
 	$svc/SubViewport/fullMap.visible = true
 	$svc/SubViewport/nameMap.visible = false
-	$svc/SubViewport/fullMap.DrawOfflineTile(mapData.entries, scaleVal)
+	$svc/SubViewport/fullMap.DrawOfflineTile(mapData.entries["mapTiles"], scaleVal)
 	await CreateTiles()
 	
 func SaveNameTiles():
 	$svc/SubViewport/fullMap.visible = false
 	$svc/SubViewport/fullMap.position.y = -100000
 	$svc/SubViewport/nameMap.visible = true
-	$svc/SubViewport/nameMap.DrawOfflineNameTile(mapData.entries, scaleVal)
+	$svc/SubViewport/nameMap.DrawOfflineNameTile(mapData.entries["mapTiles"], scaleVal)
+	await CreateNameTiles()
+	
+func SaveAdminNameTiles():
+	$svc/SubViewport/fullMap.visible = false
+	$svc/SubViewport/fullMap.position.y = -100000
+	$svc/SubViewport/nameMap.visible = true
+	$svc/SubViewport/nameMap.DrawOfflineNameTile(mapData.entries["adminBounds"], scaleVal)
 	await CreateNameTiles()
 
 func CreateTiles():
@@ -121,15 +144,15 @@ func CreateNameTiles():
 	var scale = scaleVal
 
 	camera.position = Vector2(0,0)
-	viewport.size = Vector2i(80 * scale, 100 * scale) #This subviewport draws the Cell8 image.
+	viewport.size = Vector2i(320 * scale, 500 * scale) #This subviewport draws the Cell8 image.
 	await RenderingServer.frame_post_draw
 		
 	for yChar in PlusCodes.CODE_ALPHABET_:
 		#This kept complaining about can't - a Vector2 and an Int so I had to do this.
 		#yPos -= (PlusCodes.CODE_ALPHABET_.find(yChar) * 20 * scale)
-		camera.position.y -= (100 * scale)
+		camera.position.y -= (500 * scale)
 		for xChar in PlusCodes.CODE_ALPHABET_:
-			camera.position.x = (PlusCodes.CODE_ALPHABET_.find(xChar) * 80 * scale)
+			camera.position.x = (PlusCodes.CODE_ALPHABET_.find(xChar) * 320 * scale)
 			await RenderingServer.frame_post_draw
 			var img = viewport.get_texture().get_image() # Get rendered image
 			img.save_png("user://NameTiles/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk

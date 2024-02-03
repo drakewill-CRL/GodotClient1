@@ -41,7 +41,7 @@ func _draw():
 	bgCoords.append(Vector2(0,0))
 	draw_colored_polygon(bgCoords, style["9999"].drawOps[0].color) 
 	
-	#entries has a big list of coord sets as strings
+	#entries has a dictionary, each entry is a big list of coord sets as strings
 	for entry in theseentries:
 		#TODO get style rule color and size for drawing here
 		#TODO: loop here for each style draw rule entry.
