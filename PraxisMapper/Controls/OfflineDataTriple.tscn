@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://qf1kpnsemfsq"]
+[gd_scene load_steps=7 format=3 uid="uid://qf1kpnsemfsq"]
 
 [ext_resource type="Script" path="res://PraxisMapper/Controls/OfflineData.gd" id="1_eqvas"]
 [ext_resource type="PackedScene" uid="uid://8os6eof5qcbh" path="res://PraxisMapper/APICalls/PraxisEndpoints.tscn" id="2_7j6ur"]
 [ext_resource type="Script" path="res://PraxisMapper/Scripts/DrawOfflineTile.gd" id="3_1ej14"]
 [ext_resource type="Script" path="res://PraxisMapper/Scripts/DrawOfflineNameTile.gd" id="4_qebyi"]
 [ext_resource type="Script" path="res://PraxisMapper/Scripts/DrawOfflineBoundsTile.gd" id="5_bpe57"]
+[ext_resource type="Script" path="res://PraxisMapper/Scripts/DrawOfflineTerrainTile.gd" id="6_ol8ni"]
 
 [node name="OfflineData" type="Node2D"]
 script = ExtResource("1_eqvas")
@@ -43,8 +44,8 @@ anchor_mode = 0
 
 [node name="svc3" type="SubViewportContainer" parent="."]
 offset_left = -10000.0
-offset_right = -9960.0
-offset_bottom = 40.0
+offset_right = -9488.0
+offset_bottom = 512.0
 
 [node name="SubViewport" type="SubViewport" parent="svc3"]
 handle_input_locally = false
@@ -54,4 +55,19 @@ render_target_update_mode = 4
 script = ExtResource("5_bpe57")
 
 [node name="subcam" type="Camera2D" parent="svc3/SubViewport"]
+anchor_mode = 0
+
+[node name="svc4" type="SubViewportContainer" parent="."]
+offset_left = -10000.0
+offset_right = -9488.0
+offset_bottom = 512.0
+
+[node name="SubViewport" type="SubViewport" parent="svc4"]
+handle_input_locally = false
+render_target_update_mode = 4
+
+[node name="terrainMap" type="Node2D" parent="svc4/SubViewport"]
+script = ExtResource("6_ol8ni")
+
+[node name="subcam" type="Camera2D" parent="svc4/SubViewport"]
 anchor_mode = 0

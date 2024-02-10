@@ -96,6 +96,7 @@ func _ready():
 	DirAccess.make_dir_absolute("user://MapTiles")
 	DirAccess.make_dir_absolute("user://NameTiles")
 	DirAccess.make_dir_absolute("user://BoundsTiles")
+	DirAccess.make_dir_absolute("user://TerrainTiles")
 	DirAccess.make_dir_absolute("user://Styles")
 	DirAccess.make_dir_absolute("user://Offline")
 	gps_provider = Engine.get_singleton("GodotAndroidGpsProvider")
@@ -124,6 +125,20 @@ func _ready():
 		debugControls.position.y = 0
 		debugControls.z_index = 200
 		
+static func GetDataFromZip(file, plusCode):
+	var zipReader = ZIPReader.new()
+	var err = zipReader.open("user://" + file) #Assumes this was written to the user partition, not resources.
+	if (err != OK):
+		return
+		
+	var code2 = plusCode.substr(0, 2)
+	var code4 = plusCode.substr(2, 2)
+	var rawdata := zipReader.read_file(code2 + "/" + code4 + "/" + plusCode + ".json")
+	var realData = rawdata.get_string_from_utf8()
+	var json = JSON.new()
+	json.parse(realData)
+	return json.data
+
 func MakeOfflineTiles(plusCode, scale):
 	#var offlineNode = preload("res://PraxisMapper/Controls/OfflineData.tscn")
 	#TODO: rename this later once it's done as cleanup
@@ -134,21 +149,27 @@ func MakeOfflineTiles(plusCode, scale):
 	await offlineInst.tiles_saved
 	remove_child(offlineInst)
 	
-static func GetNameFromNameTile(plusCode8Tile, pixelX, pixelY):
-	var locationData = FileAccess.open("user://Offline/" + plusCode8Tile.substr(0,6) + ".json", FileAccess.READ)
-	var json = JSON.new()
-	var textData = locationData.get_as_text()
-	json.parse(textData)
-	var mapData = json.data
-		
-	var nameTile = Image.load_from_file("user://NameTiles/" + plusCode8Tile + "-4.png")
-	var pixel = nameTile.get_pixel(pixelX, pixelY)
-	if (pixel == Color.BLACK):
-		return ""
+static func GetDataOnPoint(plusCode8, pixelX, pixelY, scale):
+	var mapData = GetDataFromZip("OhioOffline.zip", plusCode8)
 	
-	var nameTableId = pixel.r8 + pixel.g8 * 255 + pixel.b8 * 65535
-	if (nameTableId == 0):
-		return ""
+	var name = ""
+	var terrain = ""
+	var adminBound = ""
 
-	var name = mapData.nameTable[str(nameTableId)]
-	return name
+	var nameTile = Image.load_from_file("user://NameTiles/" + plusCode8 + "-" + str(scale) + ".png")
+	var pixel = nameTile.get_pixel(pixelX, pixelY)
+	var nameTableId = pixel.r8 + (pixel.g8 * 255) + (pixel.b8 * 65535)
+	if nameTableId > 0:
+		name = mapData.nameTable[str(nameTableId)]
+	var terrainTile = Image.load_from_file("user://TerrainTiles/" + plusCode8 + "-" + str(scale) + ".png")
+	pixel = terrainTile.get_pixel(pixelX, pixelY)
+	var terrainTableId = pixel.r8 + (pixel.g8 * 255) + (pixel.b8 * 65535)
+	#if terrainTableId > 0:
+		#terrain = mapData.nameTable[str(nameTableId)]
+	var boundsTile = Image.load_from_file("user://BoundsTiles/" + plusCode8 + "-" + str(scale) + ".png")
+	pixel = boundsTile.get_pixel(pixelX, pixelY)
+	var boundsNameId = pixel.r8 + (pixel.g8 * 255) + (pixel.b8 * 65535)
+	if (boundsNameId > 0):
+		adminBound = mapData.nameTable[str(boundsNameId)]
+	
+	return name + "|" + terrain + "|" + adminBound

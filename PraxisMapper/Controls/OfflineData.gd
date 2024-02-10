@@ -39,6 +39,7 @@ func GetStyle():
 		var info = json.get_data()
 		$svc/SubViewport/fullMap.style = info
 		$svc2/SubViewport/nameMap.style = info
+		$svc4/SubViewport/terrainMap.style = info
 		styleData.close()
 		
 	style_ready.emit()
@@ -132,25 +133,31 @@ func CreateAllTiles():
 	$svc/SubViewport/fullMap.position.y = 0
 	$svc2/SubViewport/nameMap.position.y = 40000
 	$svc3/SubViewport/boundsMap.position.y = 80000
+	$svc4/SubViewport/terrainMap.position.y = 120000
 	
 	$svc/SubViewport/fullMap.DrawOfflineTile(mapData.entries["mapTiles"], scaleVal)
 	$svc2/SubViewport/nameMap.DrawOfflineNameTile(mapData.entries["mapTiles"], scaleVal)
 	$svc3/SubViewport/boundsMap.DrawOfflineBoundsTile(mapData.entries["adminBoundsFilled"], scaleVal)
+	$svc4/SubViewport/terrainMap.DrawOfflineTerrainTile(mapData.entries["mapTiles"], scaleVal)
 	
 	var viewport1 = $svc/SubViewport
 	var viewport2 = $svc2/SubViewport
 	var viewport3 = $svc3/SubViewport
+	var viewport4 = $svc4/SubViewport
 	var camera1 = $svc/SubViewport/subcam
 	var camera2 = $svc2/SubViewport/subcam
 	var camera3 = $svc3/SubViewport/subcam
+	var camera4 = $svc4/SubViewport/subcam
 	var scale = scaleVal
 	
 	camera1.position = Vector2(0,0)
 	camera2.position = Vector2(0,40000)
 	camera3.position = Vector2(0,80000)
+	camera4.position = Vector2(0,120000)
 	viewport1.size = Vector2i(320 * scale, 500 * scale)
 	viewport2.size = Vector2i(320 * scale, 500 * scale)
 	viewport3.size = Vector2i(320 * scale, 500 * scale)
+	viewport4.size = Vector2i(320 * scale, 500 * scale)
 	await RenderingServer.frame_post_draw
 		
 	for yChar in PlusCodes.CODE_ALPHABET_:
@@ -159,10 +166,12 @@ func CreateAllTiles():
 		camera1.position.y -= (500 * scale)
 		camera2.position.y -= (500 * scale)
 		camera3.position.y -= (500 * scale)
+		camera4.position.y -= (500 * scale)
 		for xChar in PlusCodes.CODE_ALPHABET_:
 			camera1.position.x = (PlusCodes.CODE_ALPHABET_.find(xChar) * 320 * scale)
 			camera2.position.x = (PlusCodes.CODE_ALPHABET_.find(xChar) * 320 * scale)
 			camera3.position.x = (PlusCodes.CODE_ALPHABET_.find(xChar) * 320 * scale)
+			camera4.position.x = (PlusCodes.CODE_ALPHABET_.find(xChar) * 320 * scale)
 			await RenderingServer.frame_post_draw
 			var img1 = viewport1.get_texture().get_image() # Get rendered image
 			img1.save_png("user://MapTiles/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk
@@ -170,6 +179,8 @@ func CreateAllTiles():
 			img2.save_png("user://NameTiles/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk
 			var img3 = viewport3.get_texture().get_image() # Get rendered image
 			img3.save_png("user://BoundsTiles/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk
+			var img4 = viewport4.get_texture().get_image() # Get rendered image
+			img4.save_png("user://TerrainTiles/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk
 			print("Saved tiles for " + plusCode + yChar + xChar)
 	
 	tiles_saved.emit()

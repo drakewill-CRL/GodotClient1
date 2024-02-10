@@ -66,7 +66,7 @@ func _draw():
 				draw_circle(polyCoords[0], s.sizePx * 2.0 * scale * 5, s.color)
 			elif (entry.gt == 2):
 				#This is significantly faster than calling draw_line for each of these.
-				draw_polyline(polyCoords, s.color, s.sizePx * scale * 5) #dont antialias names, colors matter.
+				draw_polyline(polyCoords, s.color, s.sizePx * scale * 5, true) #antialias display image only.
 			elif entry.gt == 3:
 				#A single color, which is what I generally use. TODO: decide how the texture2d part should work.
 				draw_colored_polygon(polyCoords, s.color) 
