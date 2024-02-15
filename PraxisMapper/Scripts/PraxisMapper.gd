@@ -87,10 +87,13 @@ func on_monitoring_location_result(location: Dictionary) -> void:
 		plusCode_changed.emit(currentPlusCode, lastPlusCode)
 		print("new plusCode: " + plusCode)
 		
-func perm_check(granted):
-	print("permissions: " + granted)
-	gps_provider.on_monitoring_location_result.connect(on_monitoring_location_result)
-	gps_provider.start_monitoring(gps_provider.get_accuracy_high(), 500, 0.5, true)
+func perm_check(permName, wasGranted):
+	print("permissions: " + permName)
+	print(wasGranted)
+	if permName == "android.permission.ACCESS_FINE_LOCATION" and wasGranted == true:
+		print("enabling GPS")
+		gps_provider.on_monitoring_location_result.connect(on_monitoring_location_result)
+		gps_provider.start_monitoring(gps_provider.get_accuracy_high(), 500, 0.5, true)
 
 func _ready():
 	DirAccess.make_dir_absolute("user://MapTiles")
@@ -99,13 +102,16 @@ func _ready():
 	DirAccess.make_dir_absolute("user://TerrainTiles")
 	DirAccess.make_dir_absolute("user://Styles")
 	DirAccess.make_dir_absolute("user://Offline")
+	
+	get_tree().on_request_permissions_result.connect(perm_check)
+	
 	gps_provider = Engine.get_singleton("GodotAndroidGpsProvider")
 	if gps_provider != null:
 		#TODO: GPS location currently works. GPS Permisisons currently do NOT. Needs manually enabled.
 		#gps_provider.on_request_precise_gps_result.connect(perm_check)
 		#gps_provider.request_precise_gps_permission()
-		var allowed = OS.request_permissions()
-		if (allowed == true): #permissions were granted on a previous run.
+		var allowed = OS.request_permissions()  #doesnt seem to work on 4.1.1 at all?
+		if (allowed == true): #permissions were granted on a previous run or manually
 			print("allowed")
 			gps_provider.on_monitoring_location_result.connect(on_monitoring_location_result)
 			gps_provider.start_monitoring(gps_provider.get_accuracy_high(), 500, 0.5, true)
@@ -113,6 +119,8 @@ func _ready():
 		else: #we had to ask for permissions, logic kept running.
 			print("no permissions yet.")
 			#TODO: loop/check until we do have permissions? Or inform user they need to grant?
+			#TODO: for now i need to display a popup that blocks viewing the game until the user 
+			#sets the permission manually
 			
 		#print('perm request sent')
 	else:
