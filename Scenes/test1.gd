@@ -7,7 +7,7 @@ func _ready():
 	print("getting new tile")
 	mapTile.GetTile("86HWGGGP")
 	
-	var apicallScene = preload("res://PraxisMapper/Controls/PraxisAPICall.tscn")
+	var apicallScene = preload("res://PraxisMapper/APICalls/PraxisAPICall.tscn")
 	var apicall = apicallScene.instantiate()
 	var results = apicall.call_url("/Server/Test")
 	print(results.get_string_from_utf8())
