@@ -53,6 +53,15 @@ static var gps_provider
 static var reauthCode = 419 #AuthTimeout HTTP response
 static var isReauthing = false #most calls should abort or wait if we're reauthing.
 
+#Use this so that each client generates the same values for a specific pluscode
+#Due to hash being a 32-bit int, this is only likely to be unique for 6-digit or shorter codes
+#8-digit or longer codes are nearly guaranteed to have duplicates SOMEWHERE on the planet, but 
+#probably not nearby.
+static func GetFixedRNGForPluscode(pluscode):
+	var rng = RandomNumberGenerator.new()
+	rng.seed = hash(pluscode)
+	return rng
+
 static func forceChange(newCode):
 	lastPlusCode = currentPlusCode
 	currentPlusCode = newCode
