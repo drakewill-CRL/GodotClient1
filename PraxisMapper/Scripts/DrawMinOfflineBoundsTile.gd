@@ -2,8 +2,15 @@ extends Node2D
 
 #TODO: i might need to specifically load the adminBoundsFilled entries?
 
+#This is for drawing item NAMES onto a maptile from OfflineV2 data
+#Its nearly identical in logic, except this will use the name index and make up a color for it.
+
 var theseentries = null
 var thisscale = 1
+
+#NOTE: drawOps are drawn in order, so the earlier one has the higher LayerId in PraxisMapper style language.
+#the value/id/order is the MatchOrder for the style in PraxisMapper server
+
 
 #This is set from outside.
 var style #admin bounds style, not maptiles.
@@ -51,28 +58,8 @@ func _draw():
 			var b = (int(entry.nid / 65536) % 256) / 256.0
 			var nameColor = Color(r, g, b)
 			var lineSize = 1.0 * scale
-		
-			#entry.p is a string of coords separated by a pipe
-			#EX: 0,0|20,0|20,20|20,0|0,0 is a basic square.
-			var coords = entry.p.split("|", false)
-			var polyCoords = PackedVector2Array()
-			for i in coords.size():
-				var point = coords[i].split(",")
-				var workVector = Vector2(int(point[0]) * scale, int(point[1]) * scale)
-				polyCoords.append(workVector)
 
-			#These are admin bounds, 99% of these should be polygons.
-			#for s in thisStyle.drawOps:
-			if (entry.gt == 1):
-				#this is just a circle for single points, size is roughly a Cell10
-				#4.5 looks good for POIs, but bad for Trees, which there are quite a few of.
-				#trees are size 0.2, so I should probably make other elements larger?
-				#MOST of them shouldn't be points, but lines shouldn't be a Cell10 wide either.
-				draw_circle(polyCoords[0], 20 * 2.0 * scale * 5, nameColor)
-			elif (entry.gt == 2):
-				#This is significantly faster than calling draw_line for each of these.
-				draw_polyline(polyCoords, nameColor, 5 * scale * 5) #no antialiasing, colors matter.
-			elif entry.gt == 3:
-				#A single color, which is all I need for names
-				draw_colored_polygon(polyCoords, nameColor) 
+			var point = entry.c.split(",")
+			var center = Vector2(int(point[0]) * scale, int(point[1]) * scale)
+			draw_circle(center, entry.r, nameColor)
 

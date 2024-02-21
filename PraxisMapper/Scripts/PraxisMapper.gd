@@ -167,6 +167,16 @@ func MakeOfflineTiles(plusCode, scale):
 	await offlineInst.tiles_saved
 	remove_child(offlineInst)
 	
+func MakeMinOfflineTiles(plusCode):
+	#var offlineNode = preload("res://PraxisMapper/Controls/OfflineData.tscn")
+	#TODO: rename this later once it's done as cleanup
+	var offlineNode = preload("res://PraxisMapper/Controls/MinOfflineData.tscn")
+	var offlineInst = offlineNode.instantiate()
+	add_child(offlineInst)
+	await offlineInst.GetAndProcessData(plusCode,"suggestedmini")
+	await offlineInst.tiles_saved
+	remove_child(offlineInst)
+	
 static func GetDataOnPoint(plusCode8, pixelX, pixelY, scale):
 	var mapData = GetDataFromZip("OhioOffline.zip", plusCode8)
 	

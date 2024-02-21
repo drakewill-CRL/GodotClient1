@@ -4,4 +4,7 @@ extends Node2D
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	await PraxisCore.MakeOfflineTiles("86HWGG", 1)
+	
+	await PraxisCore.MakeMinOfflineTiles("86HWGG")
+
+
