@@ -4,8 +4,10 @@ To setup PraxisMapper for your game:
 	* Drop the android folder int your game as well.
 	* Add an Autoload to your game for PraxisMapper/Scripts/PraxisMapper.gd, and name it PraxisCore
 	* Add an Android export target, and set some stuff in it
-	* * TODO: remember all of this. At the least, it's enable Gradle build for the plugin
-		and check the boxes for coarse/precise location permissions.
+	* * Enable the Godot Android GPS Provder plugin
+	* * Enable Gradle build
+	* * Allow Coarse and Fine Location permissions
+	* * Add the OfflineData folder to the Resource export, if using built-in offline data.
 	* Make sure your game, somewhere, calls OS.request_permissions() to actually start getting GPS info.
 	
 ...Or use this project as the start of your game, it's got most of that already set up.
