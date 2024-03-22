@@ -101,8 +101,8 @@ func perm_check(permName, wasGranted):
 	print(wasGranted)
 	if permName == "android.permission.ACCESS_FINE_LOCATION" and wasGranted == true:
 		print("enabling GPS")
-		gps_provider.on_monitoring_location_result.connect(on_monitoring_location_result)
-		gps_provider.start_monitoring(gps_provider.get_accuracy_high(), 500, 0.5, true)
+		gps_provider.onLocationUpdates.connect(on_monitoring_location_result)
+		gps_provider.StartListening()
 
 func _ready():
 	DirAccess.make_dir_absolute("user://MapTiles")
@@ -123,18 +123,18 @@ func _ready():
 		#TODO: GPS location currently works. GPS Permisisons currently do NOT. Needs manually enabled.
 		#gps_provider.on_request_precise_gps_result.connect(perm_check)
 		#gps_provider.request_precise_gps_permission()
-		var allowed = OS.request_permissions()  #doesnt seem to work on 4.1.1 at all?
-		if (allowed == true): #permissions were granted on a previous run or manually
-			print("allowed")
-			gps_provider.onLocationUpdates.connect(on_monitoring_location_result)
-			gps_provider.StartListening()
+		#var allowed = OS.request_permissions()  #doesnt seem to work on 4.1.1 at all?
+		#if (allowed == true): #permissions were granted on a previous run or manually
+		#	print("allowed")
+			#gps_provider.onLocationUpdates.connect(on_monitoring_location_result)
+			#gps_provider.StartListening()
 			#print('requesting permissions')
-		else: #we had to ask for permissions, logic kept running.
-			print("no permissions yet.")
-			#TODO: loop/check until we do have permissions? Or inform user they need to grant?
-			#TODO: for now i need to display a popup that blocks viewing the game until the user 
+		#else: #we had to ask for permissions, logic kept running.
+			#print("no permissions yet.")
+			##TODO: loop/check until we do have permissions? Or inform user they need to grant?
+			##TODO: for now i need to display a popup that blocks viewing the game until the user 
 			#sets the permission manually
-		print("done loading provider")
+		#print("done loading provider")
 			
 		#print('perm request sent')
 	else:

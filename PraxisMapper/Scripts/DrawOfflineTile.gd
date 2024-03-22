@@ -27,6 +27,11 @@ func _draw():
 	var scale = thisscale
 	var width = 80 * 20 * 16 #= 25600
 	var height = 100  * 20 * 20 #= 40000
+	#NOTE: if I embed this node into a scrollview, the rendered results are 1/4th this size
+	#EX: 6,400 x 10,000 . I should figure out why that's apparently being scaled down
+	
+	
+	
 	#REMEMBER: PlusCode origin is at the BOTTOM-left, these draw calls use the TOP left.
 	#This should do the same invert drawing that PraxisMapper does server-side.
 	draw_set_transform(Vector2(0,0), 0, Vector2(1,-1))
@@ -45,7 +50,8 @@ func _draw():
 		#TODO get style rule color and size for drawing here
 		#TODO: loop here for each style draw rule entry.
 		
-		var thisStyle = style[str(entry.tid)]
+		var styleId = str(entry.tid)
+		var thisStyle = style[styleId]
 		var lineSize = 1.0 * scale
 		
 		#entry.p is a string of coords separated by a pipe
@@ -63,11 +69,12 @@ func _draw():
 				#4.5 looks good for POIs, but bad for Trees, which there are quite a few of.
 				#trees are size 0.2, so I should probably make other elements larger?
 				#MOST of them shouldn't be points, but lines shouldn't be a Cell10 wide either.
-				draw_circle(polyCoords[0], s.sizePx * 2.0 * scale * 5, s.color)
+				draw_circle(polyCoords[0], s.sizePx * 2.0 * scale, s.color)
 			elif (entry.gt == 2):
 				#This is significantly faster than calling draw_line for each of these.
-				draw_polyline(polyCoords, s.color, s.sizePx * scale * 5, true) #antialias display image only.
+				draw_polyline(polyCoords, s.color, s.sizePx * scale, true) #antialias display image only.
 			elif entry.gt == 3:
 				#A single color, which is what I generally use. TODO: decide how the texture2d part should work.
 				draw_colored_polygon(polyCoords, s.color) 
 	print("Drawing done")
+	#position.y = height

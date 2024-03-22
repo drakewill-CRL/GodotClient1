@@ -11,16 +11,19 @@ var accumulated_distance
 func on_monitoring_location_result(location: Dictionary) -> void:
 	print_location_info(location)
 	
+	
+
 func print_location_info(location: Dictionary) -> void:
 	print("showing location info")
 	#if last_latitude and last_longitude:
 		#accumulated_distance += gps_provider.get_distance_between(last_latitude, last_longitude, location["latitude"], location["longitude"])
 	
-	var text: String = "Coordinates: " + str(location["latitude"]) + " , " + str(location["longitude"])
-	#text += "\n"
-	#text += "\n"
-	#text += "Accumulated distance: " + str(accumulated_distance) + " m"
-	text += "\n"
+	var text: String = "Coordinates: " + str(location["latitude"]) + " , " + str(location["longitude"]) + "\n"
+	text += "Accuracy: " + str(location["accuracy"]) + "\n"
+	text += "Altitude: " + str(location["altitude"]) + "\n"
+	text += "Vertical Accuracy: " + str(location["verticalAccuracyMeters"]) + "\n"
+	text += "Speed: " + str(location["speed"]) + "\n"
+	text += "Time: " + str(location["time"]) + "\n\n"
 	text += "PlusCode:" + PlusCodes.EncodeLatLon(location["latitude"], location["longitude"])
 	
 	lb_location_info.text = text

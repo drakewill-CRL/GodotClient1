@@ -1,0 +1,52 @@
+[gd_scene load_steps=4 format=3 uid="uid://4xc6m7kxibul"]
+
+[ext_resource type="Script" path="res://PraxisMapper/Scenes/Demo/OfflineDrawableDemo.gd" id="1_6ir34"]
+[ext_resource type="PackedScene" uid="uid://qf1kpnsemfsq" path="res://PraxisMapper/Controls/OfflineDataTriple.tscn" id="2_kret3"]
+[ext_resource type="Script" path="res://PraxisMapper/Scripts/DrawOfflineTile.gd" id="3_gcuvw"]
+
+[node name="OfflineDrawableDemo" type="Node2D"]
+script = ExtResource("1_6ir34")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_right = 1080.0
+offset_bottom = 1920.0
+color = Color(0.184314, 0, 0.0784314, 1)
+
+[node name="Label" type="Label" parent="."]
+offset_left = 459.0
+offset_top = 16.0
+offset_right = 629.0
+offset_bottom = 39.0
+text = "Drawable Offline Tiles"
+
+[node name="Label2" type="Label" parent="."]
+offset_left = 24.0
+offset_top = 71.0
+offset_right = 64.0
+offset_bottom = 94.0
+text = "This map is drawn entirely on-device. No pre-rendered images were downloaded. The drawn area is 849VQH, in San Francisco"
+
+[node name="sc" type="ScrollContainer" parent="."]
+offset_top = 200.0
+offset_right = 1080.0
+offset_bottom = 1920.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 2
+vertical_scroll_mode = 2
+
+[node name="cc" type="VBoxContainer" parent="sc"]
+clip_contents = true
+custom_minimum_size = Vector2(6400, 10000)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MapDraw" type="Node2D" parent="sc/cc"]
+position = Vector2(0, 10000)
+script = ExtResource("3_gcuvw")
+
+[node name="ColorRect" type="ColorRect" parent="sc/cc"]
+layout_mode = 2
+
+[node name="OfflineData" parent="." instance=ExtResource("2_kret3")]

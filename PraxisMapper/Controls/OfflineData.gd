@@ -137,7 +137,7 @@ func CreateAllTiles():
 	
 	$svc/SubViewport/fullMap.DrawOfflineTile(mapData.entries["mapTiles"], scaleVal)
 	$svc2/SubViewport/nameMap.DrawOfflineNameTile(mapData.entries["mapTiles"], scaleVal)
-	$svc3/SubViewport/boundsMap.DrawOfflineBoundsTile(mapData.entries["adminBoundsFilled"], scaleVal)
+	#$svc3/SubViewport/boundsMap.DrawOfflineBoundsTile(mapData.entries["adminBoundsFilled"], scaleVal)
 	$svc4/SubViewport/terrainMap.DrawOfflineTerrainTile(mapData.entries["mapTiles"], scaleVal)
 	
 	var viewport1 = $svc/SubViewport
@@ -177,8 +177,8 @@ func CreateAllTiles():
 			img1.save_png("user://MapTiles/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk
 			var img2 = viewport2.get_texture().get_image() # Get rendered image
 			img2.save_png("user://NameTiles/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk
-			var img3 = viewport3.get_texture().get_image() # Get rendered image
-			img3.save_png("user://BoundsTiles/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk
+			#var img3 = viewport3.get_texture().get_image() # Get rendered image
+			#img3.save_png("user://BoundsTiles/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk
 			var img4 = viewport4.get_texture().get_image() # Get rendered image
 			img4.save_png("user://TerrainTiles/" + plusCode + yChar + xChar + "-" + str(scale) + ".png") # Save to disk
 			print("Saved tiles for " + plusCode + yChar + xChar)
