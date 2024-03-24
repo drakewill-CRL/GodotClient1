@@ -12,16 +12,22 @@ var thisscale = 1
 #This is set from outside.
 var style #same logic as for NameTiles
 
+var commands = []
 
 func DrawOfflineTile(entries, scale):
 	theseentries = entries
 	thisscale = scale
 	queue_redraw()
+	print("redraw queued")
+	
 
 func _draw():
+	print("beginning redraw")
 	if theseentries == null:
+		print("no entries, not drawing")
 		return
 	
+	print("entries present, going on")
 	#TODO: determine background color for image and fill that first. Depends on style.
 	#for dev testing, this is the default x1 scale for a Cell8 image
 	var scale = thisscale
@@ -31,7 +37,7 @@ func _draw():
 	#EX: 6,400 x 10,000 . I should figure out why that's apparently being scaled down
 	
 	
-	
+	print("now in _draw()")
 	#REMEMBER: PlusCode origin is at the BOTTOM-left, these draw calls use the TOP left.
 	#This should do the same invert drawing that PraxisMapper does server-side.
 	draw_set_transform(Vector2(0,0), 0, Vector2(1,-1))
@@ -45,6 +51,7 @@ func _draw():
 	bgCoords.append(Vector2(0,0))
 	draw_colored_polygon(bgCoords, style["9999"].drawOps[0].color) 
 	
+	print(str(theseentries.size()) + " entries to draw")
 	#entries has a dictionary, each entry is a big list of coord sets as strings
 	for entry in theseentries:
 		#TODO get style rule color and size for drawing here
@@ -76,5 +83,5 @@ func _draw():
 			elif entry.gt == 3:
 				#A single color, which is what I generally use. TODO: decide how the texture2d part should work.
 				draw_colored_polygon(polyCoords, s.color) 
-	print("Drawing done")
+	print("Drawing done from _draw()")
 	#position.y = height

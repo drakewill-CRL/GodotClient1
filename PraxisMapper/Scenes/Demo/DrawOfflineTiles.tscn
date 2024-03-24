@@ -1,0 +1,34 @@
+[gd_scene load_steps=3 format=3 uid="uid://dd6uicpgbumox"]
+
+[ext_resource type="Script" path="res://PraxisMapper/Scenes/Demo/DrawOfflineTiles.gd" id="1_o7n74"]
+[ext_resource type="PackedScene" uid="uid://b6cfprdbul55o" path="res://PraxisMapper/Controls/OfflineDataV3.tscn" id="2_w2ogm"]
+
+[node name="DrawOfflineTiles" type="Node2D"]
+script = ExtResource("1_o7n74")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_right = 1102.0
+offset_bottom = 1936.0
+color = Color(0.0627451, 0.164706, 0.0627451, 1)
+
+[node name="DrawOffline" parent="." instance=ExtResource("2_w2ogm")]
+makeBoundsTile = false
+
+[node name="sc" type="ScrollContainer" parent="."]
+offset_left = 14.0
+offset_top = 445.0
+offset_right = 1066.0
+offset_bottom = 1907.0
+
+[node name="vbox" type="VBoxContainer" parent="sc"]
+custom_minimum_size = Vector2(6400, 10000)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="."]
+offset_left = 14.0
+offset_top = 60.0
+offset_right = 1068.0
+offset_bottom = 417.0
+theme_override_font_sizes/font_size = 30
+text = "This demo shows PraxisMapper drawing an area of the map, then saving 1200 PNG files for reference, 400 will display in a scroll view after creation. The PNG files are saved to a data folder for reuse, but this page will redraw them every time for demo purposes."
+autowrap_mode = 3

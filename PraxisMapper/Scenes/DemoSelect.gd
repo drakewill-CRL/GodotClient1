@@ -10,6 +10,8 @@ func _ready():
 func _process(delta):
 	pass
 
+func DrawImagesTest():
+	get_tree().change_scene_to_file("res://PraxisMapper/Scenes/Demo/DrawOfflineTiles.tscn")
 
 func GpsTest():
 	get_tree().change_scene_to_file("res://Scenes/GpsTest.tscn")

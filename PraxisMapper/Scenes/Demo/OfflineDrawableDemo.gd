@@ -8,6 +8,8 @@ func _ready():
 	#is very, very slow. This won't fly for live stuff, but it should be ok if it's done once 
 	#while drawing images.
 	
+	await get_tree().create_timer(0.1).timeout #let the scene load before we draw stuff.
+	
 	$OfflineData.plusCode = "849VQH"
 	$OfflineData.GetStyle()
 	var mapfile = FileAccess.open("res://PraxisMapper/Scenes/Demo/849VQH.json", FileAccess.READ)

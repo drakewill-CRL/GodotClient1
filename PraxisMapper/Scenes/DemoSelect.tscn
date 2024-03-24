@@ -32,7 +32,7 @@ offset_top = 319.0
 offset_right = 821.0
 offset_bottom = 350.0
 scale = Vector2(2, 2)
-text = "Offline Drawable Tiles Demo"
+text = "Draw Map On Node Demo"
 
 [node name="Button2" type="Button" parent="."]
 offset_left = 325.0
@@ -51,6 +51,15 @@ offset_bottom = 234.0
 scale = Vector2(2, 2)
 text = "GPS Permissions Previously Granted"
 
+[node name="btnDrawAsImages" type="Button" parent="."]
+offset_left = 595.0
+offset_top = 442.0
+offset_right = 804.0
+offset_bottom = 473.0
+scale = Vector2(2, 2)
+text = "Draw Map To Image Demo"
+
 [connection signal="pressed" from="btnGpsInfo" to="." method="GpsTest"]
 [connection signal="pressed" from="Button" to="." method="OfflineDrawTest"]
 [connection signal="pressed" from="Button2" to="." method="EnableGps"]
+[connection signal="pressed" from="btnDrawAsImages" to="." method="DrawImagesTest"]

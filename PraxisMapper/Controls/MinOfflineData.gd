@@ -76,7 +76,7 @@ func CreateAllTiles():
 	
 	$svc/SubViewport/fullMap.position.y = 0
 	$svc2/SubViewport/nameMap.position.y = 400
-	#$svc3/SubViewport/boundsMap.position.y = 800
+	$svc3/SubViewport/boundsMap.position.y = 800
 	$svc4/SubViewport/terrainMap.position.y = 1200
 	
 	$svc/SubViewport/fullMap.DrawOfflineTile(mapData.entries["suggestedmini"], scaleVal)
